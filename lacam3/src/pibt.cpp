@@ -35,9 +35,9 @@ bool PIBT::set_new_config(const Config &Q_from, Config &Q_to,
         success = false;
         break;
       }
-      // swap collision
-      auto j = occupied_now[Q_to[i]->id];
-      if (j != NO_AGENT && j != i && Q_to[j] == Q_from[i]) {
+      // following collision
+      if (occupied_now[Q_to[i]->id] != NO_AGENT &&
+          occupied_now[Q_to[i]->id] != i) {
         success = false;
         break;
       }
@@ -115,6 +115,8 @@ bool PIBT::funcPIBT(const int i, const Config &Q_from, Config &Q_to)
   };
 
   // main loop
+
+  // XXX remove following conflict
   for (size_t k = 0; k < K + 1; ++k) {
     auto u = C_next[i][k];
 
