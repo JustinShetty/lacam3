@@ -63,7 +63,8 @@ bool PIBT::set_new_config(const Config &Q_from, Config &Q_to,
   return success;
 }
 
-bool PIBT::funcPIBT(const int i, const int i_caller, const Config &Q_from, Config &Q_to)
+bool PIBT::funcPIBT(const int i, const int i_caller, const Config &Q_from,
+                    Config &Q_to)
 {
   const auto K = Q_from[i]->neighbor.size();
 
@@ -133,7 +134,7 @@ bool PIBT::funcPIBT(const int i, const int i_caller, const Config &Q_from, Confi
         occupied_next[Q_from[i]->id] = i;
         Q_to[i] = Q_from[i];
 
-        if(funcPIBT(j, i, Q_from, Q_to)) return true;
+        if (funcPIBT(j, i, Q_from, Q_to)) return true;
 
         // revert if priority inheritance failed
         occupied_next[Q_from[i]->id] = NO_AGENT;
