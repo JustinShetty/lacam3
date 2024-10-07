@@ -47,7 +47,7 @@ bool PIBT::set_new_config(const Config &Q_from, Config &Q_to,
 
   if (success) {
     for (auto i : order) {
-      if (Q_to[i] == nullptr && !funcPIBT(i, Q_from, Q_to)) {
+      if (Q_to[i] == nullptr && !funcPIBT(i, NO_AGENT, Q_from, Q_to)) {
         success = false;
         break;
       }
@@ -63,7 +63,7 @@ bool PIBT::set_new_config(const Config &Q_from, Config &Q_to,
   return success;
 }
 
-bool PIBT::funcPIBT(const int i, const Config &Q_from, Config &Q_to)
+bool PIBT::funcPIBT(const int i, const int i_caller, const Config &Q_from, Config &Q_to)
 {
   const auto K = Q_from[i]->neighbor.size();
 
@@ -82,10 +82,14 @@ bool PIBT::funcPIBT(const int i, const Config &Q_from, Config &Q_to)
     C_next[i][k] = u;
     tie_breakers[u->id] = get_random_float(MT);  // set tie-breaker
   }
-  C_next[i][K] = Q_from[i];
+  size_t num_candidates = K;
+  if (i_caller == NO_AGENT) {
+    C_next[i][K] = Q_from[i];
+    num_candidates++;
+  }
 
-  // sort, note: K + 1 is sufficient
-  std::sort(C_next[i].begin(), C_next[i].begin() + K + 1,
+  // sort C_next
+  std::sort(C_next[i].begin(), C_next[i].begin() + num_candidates,
             [&](Vertex *const v, Vertex *const u) {
               if (v == prioritized_vertex) return true;
               if (u == prioritized_vertex) return false;
@@ -99,7 +103,7 @@ bool PIBT::funcPIBT(const int i, const Config &Q_from, Config &Q_to)
     swap_agent = is_swap_required_and_possible(i, Q_from, Q_to);
     if (swap_agent != NO_AGENT) {
       // reverse vertex scoring
-      std::reverse(C_next[i].begin(), C_next[i].begin() + K + 1);
+      std::reverse(C_next[i].begin(), C_next[i].begin() + num_candidates);
     }
   }
 
@@ -115,27 +119,32 @@ bool PIBT::funcPIBT(const int i, const Config &Q_from, Config &Q_to)
   };
 
   // main loop
-
-  // XXX remove following conflict
-  for (size_t k = 0; k < K + 1; ++k) {
+  for (size_t k = 0; k < num_candidates; ++k) {
     auto u = C_next[i][k];
 
     // avoid vertex conflicts
     if (occupied_next[u->id] != NO_AGENT) continue;
 
+    // avoid following conflicts
     const auto j = occupied_now[u->id];
+    if (j != NO_AGENT && j != i) {
+      if (Q_to[j] == nullptr) {
+        // preemptively reserve current location
+        occupied_next[Q_from[i]->id] = i;
+        Q_to[i] = Q_from[i];
 
-    // avoid swap conflicts with constraints
-    if (j != NO_AGENT && Q_to[j] == Q_from[i]) continue;
+        if(funcPIBT(j, i, Q_from, Q_to)) return true;
+
+        // revert if priority inheritance failed
+        occupied_next[Q_from[i]->id] = NO_AGENT;
+        Q_to[i] = nullptr;
+      }
+      continue;
+    }
 
     // reserve next location
     occupied_next[u->id] = i;
     Q_to[i] = u;
-
-    // priority inheritance
-    if (j != NO_AGENT && u != Q_from[i] && Q_to[j] == nullptr &&
-        !funcPIBT(j, Q_from, Q_to))
-      continue;
 
     // success to plan next one step
     if (flg_swap && k == 0) swap_operation();

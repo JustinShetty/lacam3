@@ -42,9 +42,10 @@ bool is_feasible_solution(const Instance &ins, const Solution &solution,
                j, " at vertex-", v_i_to->id, " at timestep ", t);
           return false;
         }
-        // swap conflicts
-        if (v_j_to == v_i_from && v_j_from == v_i_to) {
-          info(1, verbose, "edge conflict");
+
+        // following conflicts
+        if (v_i_to == v_j_from || v_j_to == v_i_from) {
+          info(1, verbose, "following conflict");
           return false;
         }
       }

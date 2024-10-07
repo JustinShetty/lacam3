@@ -9,6 +9,7 @@ int main()
     const auto ins = Instance(scen_filename, map_filename, 3);
     auto solution = solve(ins);
     assert(is_feasible_solution(ins, solution));
+    assert(solution.size() > 1);
   }
 
   {

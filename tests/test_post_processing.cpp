@@ -10,41 +10,46 @@ int main()
     const auto ins = Instance(map_filename, start_indexes, goal_indexes);
 
     // correct solution
-    auto sol = Solution(3);
+    auto sol = Solution(4);
     sol[0] = Config({ins.G->U[0], ins.G->U[8]});
-    sol[1] = Config({ins.G->U[1], ins.G->U[0]});
-    sol[2] = Config({ins.G->U[9], ins.G->U[1]});
-    assert(is_feasible_solution(ins, sol));
+    sol[1] = Config({ins.G->U[1], ins.G->U[8]});
+    sol[2] = Config({ins.G->U[9], ins.G->U[0]});
+    sol[3] = Config({ins.G->U[9], ins.G->U[1]});
+    assert(is_feasible_solution(ins, sol, 1));
 
     // invalid start
     sol[0] = Config({ins.G->U[0], ins.G->U[4]});
-    sol[1] = Config({ins.G->U[1], ins.G->U[0]});
-    sol[2] = Config({ins.G->U[9], ins.G->U[1]});
+    sol[1] = Config({ins.G->U[1], ins.G->U[8]});
+    sol[2] = Config({ins.G->U[9], ins.G->U[0]});
+    sol[3] = Config({ins.G->U[9], ins.G->U[1]});
     assert(!is_feasible_solution(ins, sol));
 
     // invalid goal
     sol[0] = Config({ins.G->U[0], ins.G->U[8]});
-    sol[1] = Config({ins.G->U[1], ins.G->U[0]});
-    sol[2] = Config({ins.G->U[10], ins.G->U[1]});
+    sol[1] = Config({ins.G->U[1], ins.G->U[8]});
+    sol[2] = Config({ins.G->U[5], ins.G->U[0]});
+    sol[3] = Config({ins.G->U[10], ins.G->U[1]});
     assert(!is_feasible_solution(ins, sol));
 
     // invalid transition
     sol[0] = Config({ins.G->U[0], ins.G->U[8]});
-    sol[1] = Config({ins.G->U[4], ins.G->U[0]});
-    sol[2] = Config({ins.G->U[9], ins.G->U[1]});
+    sol[1] = Config({ins.G->U[10], ins.G->U[8]});
+    sol[2] = Config({ins.G->U[9], ins.G->U[0]});
+    sol[3] = Config({ins.G->U[9], ins.G->U[1]});
     assert(!is_feasible_solution(ins, sol));
 
-    // swap conflict
+    // following conflict
     sol[0] = Config({ins.G->U[0], ins.G->U[8]});
-    sol[1] = Config({ins.G->U[8], ins.G->U[0]});
+    sol[1] = Config({ins.G->U[1], ins.G->U[0]});
     sol[2] = Config({ins.G->U[9], ins.G->U[1]});
+    sol[3] = Config({ins.G->U[9], ins.G->U[1]});
     assert(!is_feasible_solution(ins, sol));
 
     // vertex conflict
     sol[0] = Config({ins.G->U[0], ins.G->U[8]});
-    sol[1] = Config({ins.G->U[0], ins.G->U[0]});
-    sol[2] = Config({ins.G->U[8], ins.G->U[1]});
-    sol.push_back(Config({ins.G->U[9], ins.G->U[1]}));
+    sol[1] = Config({ins.G->U[1], ins.G->U[8]});
+    sol[2] = Config({ins.G->U[9], ins.G->U[0]});
+    sol[3] = Config({ins.G->U[1], ins.G->U[1]});
     assert(!is_feasible_solution(ins, sol));
   }
 
