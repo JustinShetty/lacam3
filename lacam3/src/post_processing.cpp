@@ -44,8 +44,14 @@ bool is_feasible_solution(const Instance &ins, const Solution &solution,
         }
 
         // following conflicts
-        if (v_i_to == v_j_from || v_j_to == v_i_from) {
-          info(1, verbose, "following conflict");
+        if (v_i_to == v_j_from) {
+          info(1, verbose, "following conflict: agent-", i, " follows agent-",
+               j, " onto vertex-", v_i_to->id, " at timestep ", t);
+          return false;
+        }
+        if (v_j_to == v_i_from) {
+          info(1, verbose, "following conflict: agent-", j, " follows agent-",
+               i, " onto vertex-", v_j_to->id, " at timestep ", t);
           return false;
         }
       }
