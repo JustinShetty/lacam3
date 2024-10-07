@@ -144,7 +144,7 @@ Solution Planner::solve()
     }
   }
 
-  // clear pooled operaitons
+  // clear pooled operations
   bool is_optimal = OPEN.empty();
   for (auto &proc : refiner_pool) apply_new_solution(proc.get());
   if (is_optimal) OPEN.clear();
