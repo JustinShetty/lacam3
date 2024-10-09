@@ -259,7 +259,7 @@ void Planner::rewrite(HNode *H_from, HNode *H_to)
     Q.pop();
     for (auto n_to : n_from->neighbor) {
       auto g_val = n_from->g + get_edge_cost(n_from->C, n_to->C);
-      if (g_val < n_to->g) {
+      if (g_val < n_to->g && !has_following_conflict(n_from->C, n_to->C)) {
         if (n_to == H_goal)
           info(2, verbose, deadline, "cost update: ", H_goal->g, " -> ", g_val);
         n_to->g = g_val;

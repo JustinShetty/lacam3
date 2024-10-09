@@ -134,3 +134,15 @@ std::ostream &operator<<(std::ostream &os, const Paths &paths)
   }
   return os;
 }
+
+bool has_following_conflict(const Config& c_from, const Config& c_to) {
+  std::unordered_map<Vertex*, int> occupied_from;
+  for(size_t i = 0; i < c_from.size(); ++i) {
+    occupied_from[c_from[i]] = i;
+  }
+  for(size_t i = 0; i < c_from.size(); ++i) {
+    const auto was_there = occupied_from.find(c_to[i]);
+    if (was_there != occupied_from.end() && was_there->second != i) return true;
+  }
+  return false;
+}
