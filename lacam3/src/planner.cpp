@@ -109,12 +109,6 @@ Solution Planner::solve()
       cost_initial_solution = H->g;
       H_goal = H;
       info(1, verbose, deadline, "found initial solution, cost: ", H_goal->g);
-      auto soln = backtrack(H_goal);
-      if(!is_feasible_solution(*ins, soln, verbose)) {
-        info(1, verbose, deadline, "invalid initial solution");
-      } else{
-        info(1, verbose, deadline, "valid initial solution");
-      }
       if (!FLG_STAR) break;  // finish search
       set_refiner();         // refining start
       continue;
@@ -138,12 +132,6 @@ Solution Planner::solve()
     if (iter != EXPLORED.end()) {
       // known configuration
       rewrite(H, iter->second);
-      const auto soln = backtrack(H_goal);
-      if(!is_feasible_solution(*ins, soln, verbose)) {
-        info(1, verbose, deadline, "invalid intermediate solution");
-      } else{
-        info(1, verbose, deadline, "valid intermediate solution");
-      }
 
       if (get_random_float(MT) >= RANDOM_INSERT_PROB1) {
         OPEN.push_front(iter->second);  // usual
