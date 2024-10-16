@@ -215,6 +215,17 @@ bool Planner::set_new_config(HNode *H, LNode *L, Config &Q_to, const int search_
   auto Q_cands = std::vector<Config>(PIBT_NUM, Config(N, nullptr));
   auto f_vals = std::vector<int>(PIBT_NUM, INT_MAX);
 
+  const auto Q = H->C;
+  for (auto i = 0; i < Q.size() - 1; i++) {
+    const auto v_i = Q[i];
+    for (auto j = i + 1; j < Q.size(); j++) {
+      const auto v_j = Q[j];
+      if (v_i == v_j) {
+        info(1, verbose, "[", search_iter, "] H->C has a vertex conflict between agent-", i, " and agent-", j, " at vertex-", v_i->id);
+      }
+    }
+  }
+
   // parallel
   auto worker = [&](int k) {
     // set constraints
@@ -240,7 +251,7 @@ bool Planner::set_new_config(HNode *H, LNode *L, Config &Q_to, const int search_
       for (auto j = i + 1; j < Q.size(); j++) {
         const auto v_j = Q[j];
         if (v_i == v_j) {
-          info(1, verbose, "[", search_iter, "]", "vertex conflict between agent-", i, " and agent-", j, " at vertex-", v_i->id, " in Q_cand[", k, "]");
+          info(1, verbose, "[", search_iter, "] worker ", k, " produced a config with vertex conflict between agent-", i, " and agent-", j, " at vertex-", v_i->id);
         }
       }
     }
