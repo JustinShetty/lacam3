@@ -69,3 +69,9 @@ std::ostream &operator<<(std::ostream &os, const std::set<int> &arr)
   for (auto ele : arr) os << ele << ",";
   return os;
 }
+
+uint hash_combine(uint a, uint b)
+{
+  a ^= b + 0x9e3779b9 + (a << 6) + (a >> 2);
+  return a;
+}

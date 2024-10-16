@@ -95,20 +95,28 @@ int get_sum_of_loss_paths(const std::vector<Path> &solution)
   return c;
 }
 
-int get_makespan_lower_bound(const Instance &ins, DistTable &dist_table)
+int get_makespan_lower_bound(const Instance &ins,
+                             DistTableMultiGoal &dist_table)
 {
   int c = 0;
   for (size_t i = 0; i < ins.N; ++i) {
-    c = std::max(c, dist_table.get(i, ins.starts[i]));
+    int c_i = 0;
+    for (size_t j = 1; j < ins.goal_sequences[i].size(); ++j) {
+      c_i += dist_table.get(i, j, ins.goal_sequences[i][j - 1]);
+    }
+    c = std::max(c, c_i);
   }
   return c;
 }
 
-int get_sum_of_costs_lower_bound(const Instance &ins, DistTable &dist_table)
+int get_sum_of_costs_lower_bound(const Instance &ins,
+                                 DistTableMultiGoal &dist_table)
 {
   int c = 0;
   for (size_t i = 0; i < ins.N; ++i) {
-    c += dist_table.get(i, ins.starts[i]);
+    for (size_t j = 1; j < ins.goal_sequences[i].size(); ++j) {
+      c += dist_table.get(i, j, ins.goal_sequences[i][j - 1]);
+    }
   }
   return c;
 }

@@ -69,3 +69,5 @@ void info(const int level, const int verbose, const Deadline *deadline,
 std::ostream &operator<<(std::ostream &os, const std::vector<int> &arr);
 std::ostream &operator<<(std::ostream &os, const std::list<int> &arr);
 std::ostream &operator<<(std::ostream &os, const std::set<int> &arr);
+
+uint hash_combine(uint a, uint b);

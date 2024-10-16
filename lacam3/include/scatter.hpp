@@ -22,7 +22,7 @@ struct Scatter {
   const int N;
   const int V_size;
   const int T;  // makespan lower bound
-  DistTable *D;
+  DistTableMultiGoal *D;
   const int cost_margin;
   int sum_of_path_length;
 
@@ -36,6 +36,7 @@ struct Scatter {
 
   void construct();
 
-  Scatter(const Instance *_ins, DistTable *_D, const Deadline *_deadline,
-          const int seed = 0, int _verbose = 0, int _cost_margin = 2);
+  Scatter(const Instance *_ins, DistTableMultiGoal *_D,
+          const Deadline *_deadline, const int seed = 0, int _verbose = 0,
+          int _cost_margin = 2);
 };

@@ -1,7 +1,7 @@
 #include "../include/pibt.hpp"
 
-PIBT::PIBT(const Instance *_ins, DistTable *_D, int seed, bool _flg_swap,
-           Scatter *_scatter)
+PIBT::PIBT(const Instance *_ins, DistTableMultiGoal *_D, int seed,
+           bool _flg_swap, Scatter *_scatter)
     : ins(_ins),
       MT(std::mt19937(seed)),
       N(ins->N),
@@ -94,8 +94,9 @@ bool PIBT::funcPIBT(const int i, const int i_caller, const Config &Q_from,
             [&](Vertex *const v, Vertex *const u) {
               if (v == prioritized_vertex) return true;
               if (u == prioritized_vertex) return false;
-              return D->get(i, v) + tie_breakers[v->id] <
-                     D->get(i, u) + tie_breakers[u->id];
+              return D->get(i, Q_from.goal_indices[i], v) +
+                         tie_breakers[v->id] <
+                     D->get(i, Q_from.goal_indices[i], u) + tie_breakers[u->id];
             });
 
   // emulate swap
@@ -165,8 +166,8 @@ int PIBT::is_swap_required_and_possible(const int i, const Config &Q_from,
   const auto j = occupied_now[C_next[i][0]->id];
   if (j != NO_AGENT && j != i &&  // j exists
       Q_to[j] == nullptr &&       // j does not decide next location
-      is_swap_required(i, j, Q_from[i], Q_from[j]) &&  // swap required
-      is_swap_possible(Q_from[j], Q_from[i])           // swap possible
+      is_swap_required(i, j, Q_from, Q_from[i], Q_from[j]) &&  // swap required
+      is_swap_possible(Q_from[j], Q_from[i])                   // swap possible
   ) {
     return j;
   }
@@ -177,7 +178,7 @@ int PIBT::is_swap_required_and_possible(const int i, const Config &Q_from,
       const auto k = occupied_now[u->id];
       if (k != NO_AGENT &&              // k exists
           C_next[i][0] != Q_from[k] &&  // this is for clear operation
-          is_swap_required(k, i, Q_from[i],
+          is_swap_required(k, i, Q_from, Q_from[i],
                            C_next[i][0]) &&  // emulating from one step ahead
           is_swap_possible(C_next[i][0], Q_from[i])) {
         return k;
@@ -187,13 +188,14 @@ int PIBT::is_swap_required_and_possible(const int i, const Config &Q_from,
   return NO_AGENT;
 }
 
-bool PIBT::is_swap_required(const int pusher, const int puller,
+bool PIBT::is_swap_required(const int pusher, const int puller, const Config &Q,
                             Vertex *v_pusher_origin, Vertex *v_puller_origin)
 {
   auto v_pusher = v_pusher_origin;
   auto v_puller = v_puller_origin;
   Vertex *tmp = nullptr;
-  while (D->get(pusher, v_puller) < D->get(pusher, v_pusher)) {
+  while (D->get(pusher, Q.goal_indices[pusher], v_puller) <
+         D->get(pusher, Q.goal_indices[pusher], v_pusher)) {
     auto n = v_puller->neighbor.size();
     // remove agents who need not to move
     for (auto u : v_puller->neighbor) {
@@ -211,9 +213,11 @@ bool PIBT::is_swap_required(const int pusher, const int puller,
     v_puller = tmp;
   }
 
-  return (D->get(puller, v_pusher) < D->get(puller, v_puller)) &&
-         (D->get(pusher, v_pusher) == 0 ||
-          D->get(pusher, v_puller) < D->get(pusher, v_pusher));
+  return (D->get(puller, Q.goal_indices[puller], v_pusher) <
+          D->get(puller, Q.goal_indices[puller], v_puller)) &&
+         (D->get(pusher, Q.goal_indices[pusher], v_pusher) == 0 ||
+          D->get(pusher, Q.goal_indices[pusher], v_puller) <
+              D->get(pusher, Q.goal_indices[pusher], v_pusher));
 }
 
 bool PIBT::is_swap_possible(Vertex *v_pusher_origin, Vertex *v_puller_origin)

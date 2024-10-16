@@ -30,7 +30,7 @@ struct HNode {
   std::vector<int> order;
   std::queue<LNode *> search_tree;
 
-  HNode(Config _C, DistTable *D, HNode *_parent = nullptr, int _g = 0,
+  HNode(Config _C, DistTableMultiGoal *D, HNode *_parent = nullptr, int _g = 0,
         int _h = 0);
   ~HNode();
 

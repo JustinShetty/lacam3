@@ -66,7 +66,7 @@ void print_stats(const int verbose, const Deadline *deadline,
                  const double comp_time_ms)
 {
   auto ceil = [](float x) { return std::ceil(x * 100) / 100; };
-  auto dist_table = DistTable(ins);
+  auto dist_table = DistTableMultiGoal(ins);
   const auto makespan = get_makespan(solution);
   const auto makespan_lb = get_makespan_lower_bound(ins, dist_table);
   const auto sum_of_costs = get_sum_of_costs(solution);
@@ -94,7 +94,7 @@ void make_log(const Instance &ins, const Solution &solution,
                                                         : map_name;
 
   // for instance-specific values
-  auto dist_table = DistTable(ins);
+  auto dist_table = DistTableMultiGoal(ins);
 
   // log for visualizer
   auto get_x = [&](int k) { return k % ins.G->width; };

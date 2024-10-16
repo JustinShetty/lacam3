@@ -4,7 +4,7 @@
 
 int HNode::COUNT = 0;
 
-HNode::HNode(Config _C, DistTable *D, HNode *_parent, int _g, int _h)
+HNode::HNode(Config _C, DistTableMultiGoal *D, HNode *_parent, int _g, int _h)
     : C(_C),
       parent(_parent),
       neighbor(),
@@ -29,11 +29,12 @@ HNode::HNode(Config _C, DistTable *D, HNode *_parent, int _g, int _h)
   // set priorities
   if (parent == nullptr) {
     // initialize
-    for (auto i = 0; i < N; ++i) priorities[i] = (float)D->get(i, C[i]) / 10000;
+    for (auto i = 0; i < N; ++i)
+      priorities[i] = (float)D->get(i, C.goal_indices[i], C[i]) / 10000;
   } else {
     // dynamic priorities, akin to PIBT
     for (auto i = 0; i < N; ++i) {
-      if (D->get(i, C[i]) != 0) {
+      if (D->get(i, C.goal_indices[i], C[i]) != 0) {
         priorities[i] = parent->priorities[i] + 1;
       } else {
         priorities[i] = parent->priorities[i] - (int)parent->priorities[i];

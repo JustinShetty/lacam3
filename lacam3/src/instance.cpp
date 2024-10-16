@@ -5,11 +5,11 @@ Instance::~Instance()
   if (delete_graph_after_used) delete G;
 }
 
-Instance::Instance(Graph *_G, const Config &_starts, const Config &_goals,
-                   uint _N)
-    : G(_G), starts(_starts), goals(_goals), N(_N)
-{
-}
+// Instance::Instance(Graph *_G, const Config &_starts, const Config &_goals,
+//                    uint _N)
+//     : G(_G), starts(_starts), goals(_goals), N(_N)
+// {
+// }
 
 Instance::Instance(const std::string &map_filename,
                    const std::vector<int> &start_indexes,
@@ -20,8 +20,29 @@ Instance::Instance(const std::string &map_filename,
       N(start_indexes.size()),
       delete_graph_after_used(true)
 {
-  for (auto k : start_indexes) starts.push_back(G->U[k]);
-  for (auto k : goal_indexes) goals.push_back(G->U[k]);
+  for (auto k : start_indexes) starts.push_back(G->U[k], 0);
+  for (auto k : goal_indexes) {
+    const auto vp = G->U[k];
+    goals.push_back(vp, 0);
+    goal_sequences.push_back(std::vector<Vertex *>{vp});
+  }
+}
+
+Instance::Instance(const std::string &map_filename,
+                   const std::vector<int> &start_indexes,
+                   const std::vector<std::vector<int>> &goal_index_sequences)
+    : G(new Graph(map_filename)),
+      starts(Config()),
+      goals(Config()),
+      N(start_indexes.size())
+{
+  for (auto k : start_indexes) starts.push_back(G->U[k], 0);
+  for (auto goal_sequence : goal_index_sequences) {
+    std::vector<Vertex *> as_vertices;
+    for (auto k : goal_sequence) as_vertices.push_back(G->U[k]);
+    goal_sequences.push_back(as_vertices);
+    goals.push_back(as_vertices.back(), as_vertices.size() - 1);
+  }
 }
 
 // for load instance
@@ -59,8 +80,9 @@ Instance::Instance(const std::string &scen_filename,
       auto s = G->U[G->width * y_s + x_s];
       auto g = G->U[G->width * y_g + x_g];
       if (s == nullptr || g == nullptr) continue;
-      starts.push_back(s);
-      goals.push_back(g);
+      starts.push_back(s, 0);
+      goals.push_back(g, 0);
+      goal_sequences.push_back(std::vector<Vertex *>{g});
     }
 
     if (starts.size() == N) break;
@@ -86,7 +108,7 @@ Instance::Instance(const std::string &map_filename, const int _N,
   int i = 0;
   while (true) {
     if (i >= K) return;
-    starts.push_back(G->V[s_indexes[i]]);
+    starts.push_back(G->V[s_indexes[i]], 0);
     if (starts.size() == N) break;
     ++i;
   }
@@ -98,7 +120,9 @@ Instance::Instance(const std::string &map_filename, const int _N,
   int j = 0;
   while (true) {
     if (j >= K) return;
-    goals.push_back(G->V[g_indexes[j]]);
+    const auto vp = G->V[g_indexes[j]];
+    goals.push_back(vp, 0);
+    goal_sequences.push_back(std::vector<Vertex *>{vp});
     if (goals.size() == N) break;
     ++j;
   }
@@ -111,4 +135,13 @@ bool Instance::is_valid(const int verbose) const
     return false;
   }
   return true;
+}
+
+int Instance::get_total_goals() const
+{
+  int total_goals = 0;
+  for (const auto &goals : goal_sequences) {
+    total_goals += goals.size();
+  }
+  return total_goals;
 }

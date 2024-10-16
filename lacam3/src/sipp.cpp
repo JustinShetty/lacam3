@@ -16,7 +16,7 @@ SIs &SITable::get(Vertex *v)
 
   // insert safe interval
   auto time_start = 0;
-  for (auto t = 0; t < entry.size(); ++t) {
+  for (auto t = 0; (size_t)t < entry.size(); ++t) {
     if (entry[t].empty()) continue;
     auto time_end = t - 1;
     if (time_start <= time_end) {
@@ -60,110 +60,112 @@ uint SINodeHasher::operator()(const SINode &n) const
 }
 
 // minimizing path-loss - not cost!
-Path sipp(const int i, Vertex *s_i, Vertex *g_i, DistTable *D,
+Path sipp(const int i, Vertex *s_i, Vertex *g_i, DistTableMultiGoal *D,
           CollisionTable *CT, const Deadline *deadline, const int f_upper_bound)
 {
-  auto solution_path = Path();
-  auto ST = SITable(CT);  // safe interval table
+  throw std::runtime_error("sipp not implemented");
+  // auto solution_path = Path();
+  // auto ST = SITable(CT);  // safe interval table
 
-  // setup goal
-  auto &intervals_goal = ST.get(g_i);
-  if (intervals_goal.empty()) return solution_path;
-  const auto t_goal_after = intervals_goal.back().first - 1;
+  // // setup goal
+  // auto &intervals_goal = ST.get(g_i);
+  // if (intervals_goal.empty()) return solution_path;
+  // const auto t_goal_after = intervals_goal.back().first - 1;
 
-  // setup OPEN lists
-  auto cmpNodes = [&](SINode *a, SINode *b) {
-    if (a->f != b->f) return a->f > b->f;
-    if (a->g != b->g) return a->g < b->g;
-    if (a->time_start != b->time_start) return a->time_start > b->time_start;
-    return a->uuid < b->uuid;
-  };
+  // // setup OPEN lists
+  // auto cmpNodes = [&](SINode *a, SINode *b) {
+  //   if (a->f != b->f) return a->f > b->f;
+  //   if (a->g != b->g) return a->g < b->g;
+  //   if (a->time_start != b->time_start) return a->time_start > b->time_start;
+  //   return a->uuid < b->uuid;
+  // };
 
-  int node_id = 0;
-  auto OPEN =
-      std::priority_queue<SINode *, SINodes, decltype(cmpNodes)>(cmpNodes);
-  std::unordered_map<SINode, SINode *, SINodeHasher> EXPLORED;
-  OPEN.push(new SINode(++node_id, ST.get(s_i)[0], s_i, 0, 0, D->get(i, s_i),
-                       nullptr));
+  // int node_id = 0;
+  // auto OPEN =
+  //     std::priority_queue<SINode *, SINodes, decltype(cmpNodes)>(cmpNodes);
+  // std::unordered_map<SINode, SINode *, SINodeHasher> EXPLORED;
+  // OPEN.push(new SINode(++node_id, ST.get(s_i)[0], s_i, 0, 0, D->get(i, s_i),
+  //                      nullptr));
 
-  // main loop
-  while (!OPEN.empty() && !is_expired(deadline)) {
-    auto n = OPEN.top();
-    OPEN.pop();
+  // // main loop
+  // while (!OPEN.empty() && !is_expired(deadline)) {
+  //   auto n = OPEN.top();
+  //   OPEN.pop();
 
-    // check known node
-    auto itr_e = EXPLORED.find(*n);
-    if (itr_e != EXPLORED.end() && itr_e->second->g <= n->g) {
-      delete n;
-      continue;
-    }
-    EXPLORED[*n] = n;
+  //   // check known node
+  //   auto itr_e = EXPLORED.find(*n);
+  //   if (itr_e != EXPLORED.end() && itr_e->second->g <= n->g) {
+  //     delete n;
+  //     continue;
+  //   }
+  //   EXPLORED[*n] = n;
 
-    // goal check
-    if (n->v == g_i && n->t > t_goal_after) {
-      // backtrack
-      auto t = n->t;
-      while (t >= 0) {
-        solution_path.push_back(n->v);
-        if (t == n->t) n = n->parent;
-        --t;
-      }
-      std::reverse(solution_path.begin(), solution_path.end());
-      break;
-    }
+  //   // goal check
+  //   if (n->v == g_i && n->t > t_goal_after) {
+  //     // backtrack
+  //     auto t = n->t;
+  //     while (t >= 0) {
+  //       solution_path.push_back(n->v);
+  //       if (t == n->t) n = n->parent;
+  //       --t;
+  //     }
+  //     std::reverse(solution_path.begin(), solution_path.end());
+  //     break;
+  //   }
 
-    // expand neighbors
-    for (auto &u : n->v->neighbor) {
-      for (auto &si : ST.get(u)) {
-        // invalid transition
-        if (si.first > n->time_end + 1) break;
-        if (si.second <= n->time_start) continue;
+  //   // expand neighbors
+  //   for (auto &u : n->v->neighbor) {
+  //     for (auto &si : ST.get(u)) {
+  //       // invalid transition
+  //       if (si.first > n->time_end + 1) break;
+  //       if (si.second <= n->time_start) continue;
 
-        // check existence of t
-        auto t_earliest = INT_MAX;
-        if (n->v != g_i) {
-          for (auto t = std::max(n->t, si.first - 1);
-               t <= std::min(n->time_end, si.second - 1); ++t) {
-            if (CT->getCollisionCost(n->v, u, t) == 0) {
-              t_earliest = t + 1;
-              break;
-            }
-          }
-        } else {
-          // for goal node -> reverse
-          for (auto t = std::min(n->time_end, si.second - 1);
-               t >= std::max(n->t, si.first - 1); --t) {
-            if (CT->getCollisionCost(n->v, u, t) == 0) {
-              t_earliest = t + 1;
-              break;
-            }
-          }
-        }
-        if (t_earliest >= INT_MAX) continue;
+  //       // check existence of t
+  //       auto t_earliest = INT_MAX;
+  //       if (n->v != g_i) {
+  //         for (auto t = std::max(n->t, si.first - 1);
+  //              t <= std::min(n->time_end, si.second - 1); ++t) {
+  //           if (CT->getCollisionCost(n->v, u, t) == 0) {
+  //             t_earliest = t + 1;
+  //             break;
+  //           }
+  //         }
+  //       } else {
+  //         // for goal node -> reverse
+  //         for (auto t = std::min(n->time_end, si.second - 1);
+  //              t >= std::max(n->t, si.first - 1); --t) {
+  //           if (CT->getCollisionCost(n->v, u, t) == 0) {
+  //             t_earliest = t + 1;
+  //             break;
+  //           }
+  //         }
+  //       }
+  //       if (t_earliest >= INT_MAX) continue;
 
-        // valid neighbor
-        auto g_val = n->g + (n->v != g_i ? t_earliest - n->t : 1);
-        auto f_val = g_val + D->get(i, u);
-        auto n_new = new SINode(++node_id, si, u, t_earliest, g_val, f_val, n);
+  //       // valid neighbor
+  //       auto g_val = n->g + (n->v != g_i ? t_earliest - n->t : 1);
+  //       auto f_val = g_val + D->get(i, u);
+  //       auto n_new = new SINode(++node_id, si, u, t_earliest, g_val, f_val,
+  //       n);
 
-        auto itr = EXPLORED.find(*n_new);
-        if (f_val > f_upper_bound ||
-            (itr != EXPLORED.end() && g_val >= itr->second->g)) {
-          delete n_new;
-        } else {
-          OPEN.push(n_new);
-        }
-      }
-    }
-  }
+  //       auto itr = EXPLORED.find(*n_new);
+  //       if (f_val > f_upper_bound ||
+  //           (itr != EXPLORED.end() && g_val >= itr->second->g)) {
+  //         delete n_new;
+  //       } else {
+  //         OPEN.push(n_new);
+  //       }
+  //     }
+  //   }
+  // }
 
-  // memory management
-  while (!OPEN.empty()) {
-    delete OPEN.top();
-    OPEN.pop();
-  }
-  for (auto iter : EXPLORED) delete iter.second;
-  return solution_path;
+  // // memory management
+  // while (!OPEN.empty()) {
+  //   delete OPEN.top();
+  //   OPEN.pop();
+  // }
+  // for (auto iter : EXPLORED) delete iter.second;
+  // return solution_path;
 }
 
 std::ostream &operator<<(std::ostream &os, const SINode *n)

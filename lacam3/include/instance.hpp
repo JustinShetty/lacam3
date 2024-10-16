@@ -11,13 +11,18 @@ struct Instance {
   Graph *G;       // graph
   Config starts;  // initial configuration
   Config goals;   // goal configuration
-  const uint N;   // number of agents
+  std::vector<std::vector<Vertex *>>
+      goal_sequences;  // agent-id -> goal sequence
+  const uint N;        // number of agents
   bool delete_graph_after_used;
 
-  Instance(Graph *_G, const Config &_starts, const Config &_goals, uint _N);
+  // Instance(Graph *_G, const Config &_starts, const Config &_goals, uint _N);
   Instance(const std::string &map_filename,
            const std::vector<int> &start_indexes,
            const std::vector<int> &goal_indexes);
+  Instance(const std::string &map_filename,
+           const std::vector<int> &start_indexes,
+           const std::vector<std::vector<int>> &goal_index_sequences);
   // for MAPF benchmark
   Instance(const std::string &scen_filename, const std::string &map_filename,
            const int _N = 1);
@@ -28,6 +33,8 @@ struct Instance {
 
   // simple feasibility check of instance
   bool is_valid(const int verbose = 0) const;
+
+  int get_total_goals() const;
 };
 
 // solution: a sequence of configurations

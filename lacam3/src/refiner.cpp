@@ -1,7 +1,7 @@
 #include "../include/refiner.hpp"
 
 Solution refine(const Instance *ins, const Deadline *deadline,
-                const Solution &solution, DistTable *D, const int seed,
+                const Solution &solution, DistTableMultiGoal *D, const int seed,
                 const int verbose)
 {
   if (solution.empty()) return Solution();

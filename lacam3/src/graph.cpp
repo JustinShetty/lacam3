@@ -95,20 +95,35 @@ int Graph::size() const { return V.size(); }
 
 bool is_same_config(const Config &C1, const Config &C2)
 {
-  const auto N = C1.size();
-  for (size_t i = 0; i < N; ++i) {
+  for (size_t i = 0; i < C1.size(); ++i) {
     if (C1[i]->id != C2[i]->id) return false;
   }
   return true;
 }
 
+bool enough_goals_reached(const Config &C, int threshold)
+{
+  int count = 0;
+  for (size_t i = 0; i < C.size(); ++i) {
+    count += C.goal_indices[i];
+    if (count >= threshold) return true;
+  }
+  return false;
+}
+
 uint ConfigHasher::operator()(const Config &C) const
 {
-  uint hash = C.size();
+  uint location_hash = C.size();
   for (auto &v : C) {
-    hash ^= v->id + 0x9e3779b9 + (hash << 6) + (hash >> 2);
+    location_hash ^=
+        v->id + 0x9e3779b9 + (location_hash << 6) + (location_hash >> 2);
   }
-  return hash;
+  uint indices_hash = C.goal_indices.size();
+  for (auto &idx : C.goal_indices) {
+    indices_hash ^=
+        idx + 0x9e3779b9 + (indices_hash << 6) + (indices_hash >> 2);
+  }
+  return hash_combine(location_hash, indices_hash);
 }
 
 std::ostream &operator<<(std::ostream &os, const Vertex *v)
@@ -135,12 +150,13 @@ std::ostream &operator<<(std::ostream &os, const Paths &paths)
   return os;
 }
 
-bool has_following_conflict(const Config& c_from, const Config& c_to) {
-  std::unordered_map<Vertex*, int> occupied_from;
-  for(size_t i = 0; i < c_from.size(); ++i) {
+bool has_following_conflict(const Config &c_from, const Config &c_to)
+{
+  std::unordered_map<Vertex *, int> occupied_from;
+  for (size_t i = 0; i < c_from.size(); ++i) {
     occupied_from[c_from[i]] = i;
   }
-  for(size_t i = 0; i < c_from.size(); ++i) {
+  for (size_t i = 0; i < c_from.size(); ++i) {
     const auto was_there = occupied_from.find(c_to[i]);
     if (was_there != occupied_from.end() && was_there->second != i) return true;
   }

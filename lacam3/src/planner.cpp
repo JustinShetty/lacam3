@@ -1,8 +1,9 @@
 #include "../include/planner.hpp"
-#include "../include/post_processing.hpp"
 
 #include <algorithm>
 #include <iostream>
+
+#include "../include/post_processing.hpp"
 
 bool Planner::FLG_SWAP = true;
 bool Planner::FLG_STAR = true;
@@ -25,7 +26,7 @@ constexpr int CHECKPOINTS_NIL = -1;
 constexpr auto TIME_ZERO = std::chrono::seconds(0);
 
 Planner::Planner(const Instance *_ins, int _verbose, const Deadline *_deadline,
-                 int _seed, int _depth, DistTable *_D)
+                 int _seed, int _depth, DistTableMultiGoal *_D)
     : ins(_ins),
       deadline(_deadline),
       seed(_seed),
@@ -34,7 +35,7 @@ Planner::Planner(const Instance *_ins, int _verbose, const Deadline *_deadline,
       depth(_depth),
       N(ins->N),
       V_size(ins->G->size()),
-      D((_D == nullptr) ? new DistTable(ins) : _D),
+      D((_D == nullptr) ? new DistTableMultiGoal(ins) : _D),
       delete_dist_table_after_used(_D == nullptr),
       heuristic(new Heuristic(ins, D)),
       scatter(nullptr),
@@ -102,6 +103,8 @@ Solution Planner::solve()
       OPEN.pop_front();
       continue;
     }
+
+    // XXX update goal indices !
 
     // check goal condition
     if (H_goal == nullptr && is_same_config(H->C, ins->goals)) {
@@ -176,7 +179,7 @@ void Planner::apply_new_solution(const Solution &plan)
   // forcibly insert configuration
   HNode *H_from = EXPLORED[plan[0]];
   HNode *H_to = nullptr;
-  for (auto t = 1; t < plan.size(); ++t) {
+  for (size_t t = 1; t < plan.size(); ++t) {
     auto &&Q = plan[t];
     auto iter = EXPLORED.find(Q);
     if (iter != EXPLORED.end()) {
@@ -276,7 +279,7 @@ void Planner::rewrite(HNode *H_from, HNode *H_to)
 int Planner::get_edge_cost(const Config &C1, const Config &C2)
 {
   auto cost = 0;
-  for (uint i = 0; i < N; ++i) {
+  for (auto i = 0; i < N; ++i) {
     if (C1[i] != ins->goals[i] || C2[i] != ins->goals[i]) {
       cost += 1;
     }
@@ -323,31 +326,34 @@ void Planner::set_refiner()
 
 Solution Planner::get_refined_plan(const Solution &plan)
 {
-  auto MT_internal = std::mt19937(seed_refiner);
-  if (depth < 1 && plan.size() > 3 &&
-      get_random_float(MT_internal) < RECURSIVE_RATE) {
-    // recursive LaCAM
-    auto ins_tmp =
-        Instance(ins->G, plan[get_random_int(MT_internal, 1, plan.size() - 2)],
-                 ins->goals, N);
-    auto deadline_tmp = Deadline(std::min(
-        RECURSIVE_TIME_LIMIT,
-        deadline == nullptr ? INT_MAX
-                            : deadline->time_limit_ms - elapsed_ms(deadline)));
-    auto planner_tmp =
-        Planner(&ins_tmp, 0, &deadline_tmp, seed_refiner, depth + 1, D);
-    info(4, verbose, deadline, "refiner-", planner_tmp.seed,
-         "\tactivated (recursive LaCAM)");
-    auto res = planner_tmp.solve();
-    info(4, verbose, deadline, "refiner-", planner_tmp.seed,
-         "\tcompleted (recursive LaCAM)");
-    return res;
-  } else if (RECURSIVE_RATE < 1.0) {
-    // iterative refinement
-    return refine(ins, deadline, plan, D, seed_refiner, verbose - 4);
-  } else {
-    return Solution();
-  }
+  throw std::runtime_error("get_refined_plan not implemented");
+  //   auto MT_internal = std::mt19937(seed_refiner);
+  //   if (depth < 1 && plan.size() > 3 &&
+  //       get_random_float(MT_internal) < RECURSIVE_RATE) {
+  //     // recursive LaCAM
+  //     auto ins_tmp =
+  //         Instance(ins->G, plan[get_random_int(MT_internal, 1, plan.size() -
+  //         2)],
+  //                  ins->goals, N);
+  //     auto deadline_tmp = Deadline(std::min(
+  //         RECURSIVE_TIME_LIMIT,
+  //         deadline == nullptr ? INT_MAX
+  //                             : deadline->time_limit_ms -
+  //                             elapsed_ms(deadline)));
+  //     auto planner_tmp =
+  //         Planner(&ins_tmp, 0, &deadline_tmp, seed_refiner, depth + 1, D);
+  //     info(4, verbose, deadline, "refiner-", planner_tmp.seed,
+  //          "\tactivated (recursive LaCAM)");
+  //     auto res = planner_tmp.solve();
+  //     info(4, verbose, deadline, "refiner-", planner_tmp.seed,
+  //          "\tcompleted (recursive LaCAM)");
+  //     return res;
+  //   } else if (RECURSIVE_RATE < 1.0) {
+  //     // iterative refinement
+  //     return refine(ins, deadline, plan, D, seed_refiner, verbose - 4);
+  //   } else {
+  //     return Solution();
+  //   }
 }
 
 void Planner::update_checkpoints()

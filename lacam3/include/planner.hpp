@@ -38,7 +38,7 @@ struct Planner {
   // solver utils
   const int N;  // number of agents
   const int V_size;
-  DistTable *D;
+  DistTableMultiGoal *D;
   bool delete_dist_table_after_used;
 
   // heuristic
@@ -89,8 +89,8 @@ struct Planner {
 
   Planner(const Instance *_ins, int _verbose = 0,
           const Deadline *_deadline = nullptr, int _seed = 0,
-          int _depth = 0,          // used in recursive LaCAM
-          DistTable *_D = nullptr  // used in recursive LaCAM
+          int _depth = 0,                   // used in recursive LaCAM
+          DistTableMultiGoal *_D = nullptr  // used in recursive LaCAM
   );
   ~Planner();
   Solution solve();

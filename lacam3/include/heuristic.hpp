@@ -9,8 +9,8 @@
 
 struct Heuristic {
   const Instance *ins;
-  DistTable *D;
+  DistTableMultiGoal *D;
 
-  Heuristic(const Instance *_ins, DistTable *_D);
+  Heuristic(const Instance *_ins, DistTableMultiGoal *_D);
   int get(const Config &C);
 };

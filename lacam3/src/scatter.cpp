@@ -2,8 +2,9 @@
 
 #include "../include/metrics.hpp"
 
-Scatter::Scatter(const Instance *_ins, DistTable *_D, const Deadline *_deadline,
-                 const int seed, int _verbose, int _cost_margin)
+Scatter::Scatter(const Instance *_ins, DistTableMultiGoal *_D,
+                 const Deadline *_deadline, const int seed, int _verbose,
+                 int _cost_margin)
     : ins(_ins),
       deadline(_deadline),
       MT(std::mt19937(seed)),
@@ -58,7 +59,8 @@ void Scatter::construct()
       if (is_expired(deadline)) break;
 
       const auto i = order[_i];
-      const auto cost_ub = D->get(i, ins->starts[i]) + cost_margin;
+      // XXX
+      const auto cost_ub = D->get(i, 0, ins->starts[i]) + cost_margin;
 
       if (!paths[i].empty()) sum_of_path_length -= (paths[i].size() - 1);
 
@@ -70,7 +72,8 @@ void Scatter::construct()
                                       decltype(cmp)>(cmp);
       // used with CLOSED, vertex-id list
       const auto s_i = ins->starts[i];
-      OPEN.push(std::make_tuple(s_i, 0, D->get(i, s_i), 0, nullptr));
+      // XXX
+      OPEN.push(std::make_tuple(s_i, 0, D->get(i, 0, s_i), 0, nullptr));
       auto USED = std::vector<int>();
 
       // A*
@@ -96,7 +99,8 @@ void Scatter::construct()
 
         // expand
         for (auto u : v->neighbor) {
-          auto d_u = D->get(i, u);
+          // XXX
+          auto d_u = D->get(i, 0, u);
           if (u != s_i && CLOSED[u->id] == nullptr &&
               d_u + g_v + 1 <= cost_ub) {
             // insert new node
@@ -138,7 +142,7 @@ void Scatter::construct()
   // set scatter data
   for (auto i = 0; i < N; ++i) {
     if (paths[i].empty()) continue;
-    for (auto t = 0; t < paths[i].size() - 1; ++t) {
+    for (size_t t = 0; t < paths[i].size() - 1; ++t) {
       scatter_data[i][paths[i][t]->id] = paths[i][t + 1];
     }
   }

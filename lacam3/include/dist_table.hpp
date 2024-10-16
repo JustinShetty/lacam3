@@ -7,17 +7,21 @@
 #include "instance.hpp"
 #include "utils.hpp"
 
-struct DistTable {
+struct DistTableMultiGoal {
   const int K;  // number of vertices
-  std::vector<std::vector<int>>
-      table;  // distance table, index: agent-id & vertex-id
-  std::vector<std::queue<Vertex *>> OPEN;  // search queue
+  std::vector<std::vector<std::vector<int>>>
+      table;  // distance table, index: agent-id, goal-index, vertex-id
 
-  int get(const int i, const int v_id);   // agent, vertex-id
-  int get(const int i, const Vertex *v);  // agent, vertex
+  int get(const int i, const int goal_index,
+          const int v_id);  // agent, goal-index, vertex-id
+  inline int get(const int i, const int goal_index,
+                 const Vertex *v)  // agent, goal-index, vertex
+  {
+    return get(i, goal_index, v->id);
+  }
 
-  DistTable(const Instance &ins);
-  DistTable(const Instance *ins);
+  DistTableMultiGoal(const Instance *ins);
+  DistTableMultiGoal(const Instance &ins) : DistTableMultiGoal(&ins) {}
 
   void setup(const Instance *ins);  // initialization
 };

@@ -25,5 +25,5 @@
 #include "utils.hpp"
 
 Solution refine(const Instance *ins, const Deadline *deadline,
-                const Solution &solution, DistTable *D, const int seed = 0,
-                const int verbose = 0);
+                const Solution &solution, DistTableMultiGoal *D,
+                const int seed = 0, const int verbose = 0);

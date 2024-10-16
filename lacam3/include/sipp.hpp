@@ -48,7 +48,7 @@ struct SINodeHasher {
   uint operator()(const SINode &n) const;
 };
 
-Path sipp(const int i, Vertex *s_i, Vertex *g_i, DistTable *D,
+Path sipp(const int i, Vertex *s_i, Vertex *g_i, DistTableMultiGoal *D,
           CollisionTable *CT, const Deadline *deadline = nullptr,
           const int f_upper_bound = INT_MAX);
 

@@ -21,5 +21,5 @@ int get_sum_of_loss(const Solution &solution);
 int get_sum_of_loss(const Solution &solution, std::vector<int> &agents_subset);
 int get_sum_of_loss_paths(const std::vector<Path> &solution);
 
-int get_makespan_lower_bound(const Instance &ins, DistTable &D);
-int get_sum_of_costs_lower_bound(const Instance &ins, DistTable &D);
+int get_makespan_lower_bound(const Instance &ins, DistTableMultiGoal &D);
+int get_sum_of_costs_lower_bound(const Instance &ins, DistTableMultiGoal &D);
