@@ -15,13 +15,13 @@ int main()
     assert(solution.size() > 1);
   }
 
-  // {
-  //   const auto scen_filename = "../tests/assets/2x1.scen";
-  //   const auto map_filename = "../tests/assets/2x1.map";
-  //   const auto ins = Instance(scen_filename, map_filename, 2);
-  //   auto solution = solve(ins);
-  //   assert(solution.empty());
-  // }
+  {
+    const auto scen_filename = "../tests/assets/2x1.scen";
+    const auto map_filename = "../tests/assets/2x1.map";
+    const auto ins = Instance(scen_filename, map_filename, 2);
+    auto solution = solve(ins);
+    assert(solution.empty());
+  }
 
   return 0;
 }
