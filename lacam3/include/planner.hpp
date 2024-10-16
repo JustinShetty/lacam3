@@ -94,7 +94,7 @@ struct Planner {
   );
   ~Planner();
   Solution solve();
-  bool set_new_config(HNode *S, LNode *M, Config &Q_to);
+  bool set_new_config(HNode *S, LNode *M, Config &Q_to, const int search_iter);
   HNode *create_highlevel_node(const Config &Q, HNode *parent);
   void rewrite(HNode *H_from, HNode *H_to);
   int get_edge_cost(const Config &C1, const Config &C2);

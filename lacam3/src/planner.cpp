@@ -126,7 +126,7 @@ Solution Planner::solve()
 
     // create successors at the high-level search
     auto Q_to = Config(N, nullptr);
-    auto res = set_new_config(H, L, Q_to);
+    auto res = set_new_config(H, L, Q_to, search_iter);
     delete L;
     if (!res) continue;
 
@@ -209,7 +209,7 @@ Solution Planner::backtrack(HNode *H)
   return plan;
 }
 
-bool Planner::set_new_config(HNode *H, LNode *L, Config &Q_to)
+bool Planner::set_new_config(HNode *H, LNode *L, Config &Q_to, const int search_iter)
 {
   // worker-id, time -> configuration
   auto Q_cands = std::vector<Config>(PIBT_NUM, Config(N, nullptr));
@@ -230,6 +230,20 @@ bool Planner::set_new_config(HNode *H, LNode *L, Config &Q_to)
     for (auto &th : threads) th.join();
   } else {
     for (auto k = 0; k < PIBT_NUM; ++k) worker(k);
+  }
+
+  for (auto k = 0; k < PIBT_NUM; ++k) {
+    if (f_vals[k] == INT_MAX) continue;
+    const auto Q = Q_cands[k];
+    for (auto i = 0; i < Q.size() - 1; i++) {
+      const auto v_i = Q[i];
+      for (auto j = i + 1; j < Q.size(); j++) {
+        const auto v_j = Q[j];
+        if (v_i == v_j) {
+          info(1, verbose, "[", search_iter, "]", "vertex conflict between agent-", i, " and agent-", j, " at vertex-", v_i->id, " in Q_cand[", k, "]");
+        }
+      }
+    }
   }
 
   // obtain the best score
