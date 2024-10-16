@@ -5,7 +5,7 @@ Heuristic::Heuristic(const Instance *_ins, DistTableMultiGoal *_D)
 {
 }
 
-int Heuristic::get(const Config &Q)
+int Heuristic::get(const Config &Q) const
 {
   auto cost = 0;
   for (size_t i = 0; i < ins->N; ++i)

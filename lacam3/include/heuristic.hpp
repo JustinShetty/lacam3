@@ -12,5 +12,5 @@ struct Heuristic {
   DistTableMultiGoal *D;
 
   Heuristic(const Instance *_ins, DistTableMultiGoal *_D);
-  int get(const Config &C);
+  int get(const Config &C) const;
 };
