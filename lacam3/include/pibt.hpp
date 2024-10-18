@@ -40,9 +40,9 @@ struct PIBT {
   ~PIBT();
 
   bool set_new_config(const Config &Q_from, Config &Q_to,
-                      const std::vector<int> &order, const int search_iter);
+                      const std::vector<int> &order);
   bool funcPIBT(const int i, const int i_caller, const Config &Q_from,
-                Config &Q_to, const int search_iter);
+                Config &Q_to);
   int is_swap_required_and_possible(const int ai, const Config &Q_from,
                                     Config &Q_to);
   bool is_swap_required(const int pusher, const int puller, const Config &Q,

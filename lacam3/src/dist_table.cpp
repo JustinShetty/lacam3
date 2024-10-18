@@ -39,7 +39,8 @@ void DistTableMultiGoal::setup(const Instance *ins)
   }
 }
 
-int DistTableMultiGoal::get(const int i, const int goal_index, const int v_id) const
+int DistTableMultiGoal::get(const int i, const int goal_index,
+                            const int v_id) const
 {
   // goal_index can be past the end to signify we've already reached the last
   // goal, but when we want to use the index we need to cap it at the last goal

@@ -126,7 +126,7 @@ Solution Planner::solve()
 
     // create successors at the high-level search
     auto Q_to = Config(N, nullptr);
-    auto res = set_new_config(H, L, Q_to, search_iter);
+    auto res = set_new_config(H, L, Q_to);
     delete L;
     if (!res) continue;
 
@@ -209,29 +209,19 @@ Solution Planner::backtrack(HNode *H)
   return plan;
 }
 
-bool Planner::set_new_config(HNode *H, LNode *L, Config &Q_to, const int search_iter)
+bool Planner::set_new_config(HNode *H, LNode *L, Config &Q_to)
 {
   // worker-id, time -> configuration
   auto Q_cands = std::vector<Config>(PIBT_NUM, Config(N, nullptr));
   auto f_vals = std::vector<int>(PIBT_NUM, INT_MAX);
-
-  const auto Q = H->C;
-  for (auto i = 0; i < Q.size() - 1; i++) {
-    const auto v_i = Q[i];
-    for (auto j = i + 1; j < Q.size(); j++) {
-      const auto v_j = Q[j];
-      if (v_i == v_j) {
-        info(1, verbose, "[", search_iter, "] H->C has a vertex conflict between agent-", i, " and agent-", j, " at vertex-", v_i->id);
-      }
-    }
-  }
 
   // parallel
   auto worker = [&](int k) {
     // set constraints
     for (auto d = 0; d < L->depth; ++d) Q_cands[k][L->who[d]] = L->where[d];
     // PIBT
-    auto res = pibts[k]->set_new_config(H->C, Q_cands[k], H->order, search_iter);
+    auto res =
+        pibts[k]->set_new_config(H->C, Q_cands[k], H->order);
     if (res)
       f_vals[k] = get_edge_cost(H->C, Q_cands[k]) + heuristic->get(Q_cands[k]);
   };
@@ -241,20 +231,6 @@ bool Planner::set_new_config(HNode *H, LNode *L, Config &Q_to, const int search_
     for (auto &th : threads) th.join();
   } else {
     for (auto k = 0; k < PIBT_NUM; ++k) worker(k);
-  }
-
-  for (auto k = 0; k < PIBT_NUM; ++k) {
-    if (f_vals[k] == INT_MAX) continue;
-    const auto Q = Q_cands[k];
-    for (auto i = 0; i < Q.size() - 1; i++) {
-      const auto v_i = Q[i];
-      for (auto j = i + 1; j < Q.size(); j++) {
-        const auto v_j = Q[j];
-        if (v_i == v_j) {
-          info(1, verbose, "[", search_iter, "] worker ", k, " produced a config with vertex conflict between agent-", i, " and agent-", j, " at vertex-", v_i->id);
-        }
-      }
-    }
   }
 
   // obtain the best score

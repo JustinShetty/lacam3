@@ -15,7 +15,7 @@ struct DistTableMultiGoal {
   int get(const int i, const int goal_index,
           const int v_id) const;  // agent, goal-index, vertex-id
   inline int get(const int i, const int goal_index,
-                 const Vertex *v) const // agent, goal-index, vertex
+                 const Vertex *v) const  // agent, goal-index, vertex
   {
     return get(i, goal_index, v->id);
   }
