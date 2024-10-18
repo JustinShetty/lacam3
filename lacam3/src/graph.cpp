@@ -128,7 +128,11 @@ uint ConfigHasher::operator()(const Config &C) const
 
 std::ostream &operator<<(std::ostream &os, const Vertex *v)
 {
-  os << v->index;
+  if (v == nullptr) {
+    os << "nullptr";
+  } else {
+    os << v->index;
+  }
   return os;
 }
 
