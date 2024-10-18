@@ -20,7 +20,7 @@ PIBT::PIBT(const Instance *_ins, DistTableMultiGoal *_D, int seed,
 PIBT::~PIBT() {}
 
 bool PIBT::set_new_config(const Config &Q_from, Config &Q_to,
-                          const std::vector<int> &order)
+                          const std::vector<int> &order, const int search_iter)
 {
   bool success = true;
   // setup cache & constraints check
@@ -30,12 +30,12 @@ bool PIBT::set_new_config(const Config &Q_from, Config &Q_to,
 
     // set occupied next
     if (Q_to[i] != nullptr) {
-      // vertex collision
+      // vertex conflict
       if (occupied_next[Q_to[i]->id] != NO_AGENT) {
         success = false;
         break;
       }
-      // following collision
+      // following conflict
       if (occupied_now[Q_to[i]->id] != NO_AGENT &&
           occupied_now[Q_to[i]->id] != i) {
         success = false;
@@ -47,7 +47,7 @@ bool PIBT::set_new_config(const Config &Q_from, Config &Q_to,
 
   if (success) {
     for (auto i : order) {
-      if (Q_to[i] == nullptr && !funcPIBT(i, NO_AGENT, Q_from, Q_to)) {
+      if (Q_to[i] == nullptr && !funcPIBT(i, NO_AGENT, Q_from, Q_to, search_iter)) {
         success = false;
         break;
       }
@@ -64,18 +64,18 @@ bool PIBT::set_new_config(const Config &Q_from, Config &Q_to,
 }
 
 bool PIBT::funcPIBT(const int i, const int i_caller, const Config &Q_from,
-                    Config &Q_to)
+                    Config &Q_to, const int search_iter)
 {
   const auto K = Q_from[i]->neighbor.size();
 
   // exploit scatter data
-  Vertex *prioritized_vertex = nullptr;
-  if (scatter != nullptr) {
-    auto itr_s = scatter->scatter_data[i].find(Q_from[i]->id);
-    if (itr_s != scatter->scatter_data[i].end()) {
-      prioritized_vertex = itr_s->second;
-    }
-  }
+  // Vertex *prioritized_vertex = nullptr;
+  // if (scatter != nullptr) {
+  //   auto itr_s = scatter->scatter_data[i].find(Q_from[i]->id);
+  //   if (itr_s != scatter->scatter_data[i].end()) {
+  //     prioritized_vertex = itr_s->second;
+  //   }
+  // }
 
   // set C_next
   for (size_t k = 0; k < K; ++k) {
@@ -92,33 +92,34 @@ bool PIBT::funcPIBT(const int i, const int i_caller, const Config &Q_from,
   // sort C_next
   std::sort(C_next[i].begin(), C_next[i].begin() + num_candidates,
             [&](Vertex *const v, Vertex *const u) {
-              if (v == prioritized_vertex) return true;
-              if (u == prioritized_vertex) return false;
+              // if (v == prioritized_vertex) return true;
+              // if (u == prioritized_vertex) return false;
               return D->get(i, Q_from.goal_indices[i], v) +
                          tie_breakers[v->id] <
                      D->get(i, Q_from.goal_indices[i], u) + tie_breakers[u->id];
             });
 
   // emulate swap
-  auto swap_agent = NO_AGENT;
-  if (flg_swap) {
-    swap_agent = is_swap_required_and_possible(i, Q_from, Q_to);
-    if (swap_agent != NO_AGENT) {
-      // reverse vertex scoring
-      std::reverse(C_next[i].begin(), C_next[i].begin() + num_candidates);
-    }
-  }
+  // auto swap_agent = NO_AGENT;
+  // if (flg_swap) {
+  //   swap_agent = is_swap_required_and_possible(i, Q_from, Q_to);
+  //   if (swap_agent != NO_AGENT) {
+  //     // reverse vertex scoring
+  //     std::reverse(C_next[i].begin(), C_next[i].begin() + num_candidates);
+  //   }
+  // }
 
-  auto swap_operation = [&]() {
-    if (swap_agent != NO_AGENT &&                 // swap_agent exists
-        Q_to[swap_agent] == nullptr &&            // not decided
-        occupied_next[Q_from[i]->id] == NO_AGENT  // free
-    ) {
-      // pull swap_agent
-      occupied_next[Q_from[i]->id] = swap_agent;
-      Q_to[swap_agent] = Q_from[i];
-    }
-  };
+  // auto swap_operation = [&]() {
+  //   throw std::runtime_error("swap operation not implemented");
+  //   if (swap_agent != NO_AGENT &&                 // swap_agent exists
+  //       Q_to[swap_agent] == nullptr &&            // not decided
+  //       occupied_next[Q_from[i]->id] == NO_AGENT  // free
+  //   ) {
+  //     // pull swap_agent
+  //     occupied_next[Q_from[i]->id] = swap_agent;
+  //     Q_to[swap_agent] = Q_from[i];
+  //   }
+  // };
 
   // main loop
   for (size_t k = 0; k < num_candidates; ++k) {
@@ -132,10 +133,16 @@ bool PIBT::funcPIBT(const int i, const int i_caller, const Config &Q_from,
     if (j != NO_AGENT && j != i) {
       if (Q_to[j] == nullptr) {
         // preemptively reserve current location
+        if (occupied_next[Q_from[i]->id] != NO_AGENT) {
+          info(1, 1, "[", search_iter, "] agent-", i, " trying to preemptively reserve vertex-", u->id, ", but it is already reserved by agent-", occupied_next[Q_from[i]->id]);
+        }
         occupied_next[Q_from[i]->id] = i;
         Q_to[i] = Q_from[i];
 
-        if (funcPIBT(j, i, Q_from, Q_to)) return true;
+        if (funcPIBT(j, i, Q_from, Q_to, search_iter)) {
+          if (i == 255) info(1,1, "[", search_iter, "] agent-", i, " moves to vertex-", Q_to[i]->id);
+          return true;
+        }
 
         // revert if priority inheritance failed
         occupied_next[Q_from[i]->id] = NO_AGENT;
@@ -144,18 +151,18 @@ bool PIBT::funcPIBT(const int i, const int i_caller, const Config &Q_from,
       continue;
     }
 
-    // reserve next location
+    // success
     occupied_next[u->id] = i;
     Q_to[i] = u;
-
-    // success to plan next one step
-    if (flg_swap && k == 0) swap_operation();
+    if (i == 255) info(1,1, "[", search_iter, "] agent-", i, " moves to vertex-", Q_to[i]->id);
+    // if (flg_swap && k == 0) swap_operation();
     return true;
   }
 
-  // failed to secure node
+  // failed to secure node, remain at current location
   occupied_next[Q_from[i]->id] = i;
   Q_to[i] = Q_from[i];
+  if (i == 255) info(1,1, "[", search_iter, "] agent-", i, " moves to vertex-", Q_to[i]->id);
   return false;
 }
 
