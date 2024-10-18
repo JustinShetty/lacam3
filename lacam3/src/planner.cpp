@@ -25,9 +25,11 @@ constexpr int CHECKPOINTS_NIL = -1;
 
 constexpr auto TIME_ZERO = std::chrono::seconds(0);
 
-Planner::Planner(const Instance *_ins, int _verbose, const Deadline *_deadline,
-                 int _seed, int _depth, DistTableMultiGoal *_D)
+Planner::Planner(const Instance *_ins, int _threshold, int _verbose,
+                 const Deadline *_deadline, int _seed, int _depth,
+                 DistTableMultiGoal *_D)
     : ins(_ins),
+      threshold(_threshold),
       deadline(_deadline),
       seed(_seed),
       MT(std::mt19937(seed)),
@@ -60,13 +62,31 @@ Planner::~Planner()
   if (delete_dist_table_after_used) delete D;
 }
 
+std::vector<int> calculate_goal_indices(const Instance *ins, const Config &c,
+                                        const Config &prev_config)
+{
+  auto goal_indices = prev_config.goal_indices;
+  for (size_t i = 0; i < ins->N; ++i) {
+    const auto current_location = c[i];
+    const auto goal_seq = ins->goal_sequences[i];
+    auto &goal_idx = goal_indices[i];
+    const auto next_goal = goal_seq[goal_indices[i]];
+    if (current_location == next_goal && goal_idx < (int)goal_seq.size()) {
+      goal_idx += 1;
+    }
+  }
+  return goal_indices;
+}
+
 Solution Planner::solve()
 {
   info(1, verbose, deadline, "start search");
   update_checkpoints();
 
   // insert initial node
-  H_init = create_highlevel_node(ins->starts, nullptr);
+  auto C_init = ins->starts;
+  C_init.goal_indices = calculate_goal_indices(ins, C_init, C_init);
+  H_init = create_highlevel_node(C_init, nullptr);
   OPEN.push_front(H_init);
 
   set_scatter();
@@ -75,6 +95,7 @@ Solution Planner::solve()
   // search loop
   while (!OPEN.empty() && !is_expired(deadline)) {
     search_iter += 1;
+    if (search_iter > 10) break;
     update_checkpoints();
 
     // check pooled procedures
@@ -104,10 +125,8 @@ Solution Planner::solve()
       continue;
     }
 
-    // XXX update goal indices !
-
     // check goal condition
-    if (H_goal == nullptr && is_same_config(H->C, ins->goals)) {
+    if (H_goal == nullptr && enough_goals_reached(H->C, threshold)) {
       time_initial_solution = elapsed_ms(deadline);
       cost_initial_solution = H->g;
       H_goal = H;
@@ -127,6 +146,7 @@ Solution Planner::solve()
     // create successors at the high-level search
     auto Q_to = Config(N, nullptr);
     auto res = set_new_config(H, L, Q_to);
+    Q_to.goal_indices = calculate_goal_indices(ins, Q_to, H->C);
     delete L;
     if (!res) continue;
 
@@ -220,8 +240,7 @@ bool Planner::set_new_config(HNode *H, LNode *L, Config &Q_to)
     // set constraints
     for (auto d = 0; d < L->depth; ++d) Q_cands[k][L->who[d]] = L->where[d];
     // PIBT
-    auto res =
-        pibts[k]->set_new_config(H->C, Q_cands[k], H->order);
+    auto res = pibts[k]->set_new_config(H->C, Q_cands[k], H->order);
     if (res)
       f_vals[k] = get_edge_cost(H->C, Q_cands[k]) + heuristic->get(Q_cands[k]);
   };

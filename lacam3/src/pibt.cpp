@@ -50,8 +50,7 @@ bool PIBT::set_new_config(const Config &Q_from, Config &Q_to,
 
   if (success) {
     for (auto i : order) {
-      if (Q_to[i] == nullptr &&
-          !funcPIBT(i, NO_AGENT, Q_from, Q_to)) {
+      if (Q_to[i] == nullptr && !funcPIBT(i, NO_AGENT, Q_from, Q_to)) {
         success = false;
         break;
       }
@@ -138,9 +137,8 @@ bool PIBT::funcPIBT(const int i, const int i_caller, const Config &Q_from,
       if (Q_to[j] == nullptr) {
         // preemptively reserve current location
         if (occupied_next[Q_from[i]->id] != NO_AGENT) {
-          info(1, 1, "agent-", i,
-               " trying to preemptively reserve vertex-", u->id,
-               ", but it is already reserved by agent-",
+          info(1, 1, "agent-", i, " trying to preemptively reserve vertex-",
+               u->id, ", but it is already reserved by agent-",
                occupied_next[Q_from[i]->id]);
           return false;
         }

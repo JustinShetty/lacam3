@@ -1,9 +1,9 @@
 #include "../include/lacam.hpp"
 
-Solution solve(const Instance &ins, int verbose, const Deadline *deadline,
-               int seed)
+Solution solve(const Instance &ins, const int threshold, int verbose,
+               const Deadline *deadline, const int seed)
 {
   info(1, verbose, deadline, "pre-processing");
-  auto planner = Planner(&ins, verbose, deadline, seed);
+  auto planner = Planner(&ins, threshold, verbose, deadline, seed);
   return planner.solve();
 }

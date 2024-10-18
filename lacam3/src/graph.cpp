@@ -138,7 +138,12 @@ std::ostream &operator<<(std::ostream &os, const Vertex *v)
 
 std::ostream &operator<<(std::ostream &os, const Config &Q)
 {
-  for (auto v : Q) os << v << ",";
+  os << "{ ";
+  for (auto v : Q) os << v << " ";
+  os << "} ";
+  os << "{ ";
+  for (auto i : Q.goal_indices) os << i << " ";
+  os << "}";
   return os;
 }
 

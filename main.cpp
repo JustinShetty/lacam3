@@ -134,14 +134,15 @@ int main(int argc, char *argv[])
 
   // solve
   const auto deadline = Deadline(time_limit_sec * 1000);
-  const auto solution = solve(ins, verbose - 1, &deadline, seed);
+  const auto solution =
+      solve(ins, ins.get_total_goals(), verbose - 1, &deadline, seed);
   const auto comp_time_ms = deadline.elapsed_ms();
 
   // failure
   if (solution.empty()) info(1, verbose, &deadline, "failed to solve");
 
   // check feasibility
-  if (!is_feasible_solution(ins, solution, verbose)) {
+  if (!is_feasible_solution(ins, solution, ins.get_total_goals(), verbose)) {
     info(0, verbose, &deadline, "invalid solution");
     return 1;
   }

@@ -8,5 +8,5 @@
 #include "sipp.hpp"
 #include "utils.hpp"
 
-Solution solve(const Instance &ins, const int verbose = 0,
-               const Deadline *deadline = nullptr, int seed = 0);
+Solution solve(const Instance &ins, const int threshold, const int verbose = 0,
+               const Deadline *deadline = nullptr, const int seed = 0);

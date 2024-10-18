@@ -8,7 +8,7 @@
 #include "utils.hpp"
 
 bool is_feasible_solution(const Instance &ins, const Solution &solution,
-                          const int verbose = 0);
+                          const int threshold, const int verbose = 0);
 void print_stats(const int verbose, const Deadline *deadline,
                  const Instance &ins, const Solution &solution,
                  const double comp_time_ms);

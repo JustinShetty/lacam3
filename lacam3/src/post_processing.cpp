@@ -4,7 +4,7 @@
 #include "../include/planner.hpp"
 
 bool is_feasible_solution(const Instance &ins, const Solution &solution,
-                          const int verbose)
+                          const int threshold, const int verbose)
 {
   if (solution.empty()) return true;
 
@@ -15,7 +15,7 @@ bool is_feasible_solution(const Instance &ins, const Solution &solution,
   }
 
   // check goal locations
-  if (!is_same_config(solution.back(), ins.goals)) {
+  if (!enough_goals_reached(solution.back(), threshold)) {
     info(1, verbose, "invalid goals");
     return false;
   }

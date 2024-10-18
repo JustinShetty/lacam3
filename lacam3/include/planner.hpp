@@ -29,6 +29,7 @@
 
 struct Planner {
   const Instance *ins;
+  const int threshold;
   const Deadline *deadline;
   const int seed;
   std::mt19937 MT;
@@ -87,7 +88,7 @@ struct Planner {
   int cost_initial_solution;
   std::vector<int> checkpoints;
 
-  Planner(const Instance *_ins, int _verbose = 0,
+  Planner(const Instance *_ins, int _threshold, int _verbose = 0,
           const Deadline *_deadline = nullptr, int _seed = 0,
           int _depth = 0,                   // used in recursive LaCAM
           DistTableMultiGoal *_D = nullptr  // used in recursive LaCAM
