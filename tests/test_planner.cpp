@@ -7,7 +7,7 @@ int main()
   Planner::FLG_STAR = false;
   Planner::PIBT_NUM = 1;
 
-  const int VERBOSITY = 5;
+  const int VERBOSITY = 0;
 
   // basic
   {

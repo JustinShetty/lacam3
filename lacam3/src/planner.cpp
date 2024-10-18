@@ -95,7 +95,6 @@ Solution Planner::solve()
   // search loop
   while (!OPEN.empty() && !is_expired(deadline)) {
     search_iter += 1;
-    if (search_iter > 10) break;
     update_checkpoints();
 
     // check pooled procedures
