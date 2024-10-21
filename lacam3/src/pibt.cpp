@@ -105,28 +105,6 @@ namespace lacam
                  D->get(i, Q_from.goal_indices[i], u) + tie_breakers[u->id];
         });
 
-    // emulate swap
-    auto swap_agent = NO_AGENT;
-    if (flg_swap) {
-      swap_agent = is_swap_required_and_possible(i, Q_from, Q_to);
-      if (swap_agent != NO_AGENT) {
-        // reverse vertex scoring
-        std::reverse(C_next[i].begin(), C_next[i].begin() + num_candidates);
-      }
-    }
-
-    auto swap_operation = [&]() {
-      throw std::runtime_error("swap operation not implemented");
-      if (swap_agent != NO_AGENT &&                 // swap_agent exists
-          Q_to[swap_agent] == nullptr &&            // not decided
-          occupied_next[Q_from[i]->id] == NO_AGENT  // free
-      ) {
-        // pull swap_agent
-        occupied_next[Q_from[i]->id] = swap_agent;
-        Q_to[swap_agent] = Q_from[i];
-      }
-    };
-
     // main loop
     for (size_t k = 0; k < num_candidates; ++k) {
       auto u = C_next[i][k];
@@ -160,101 +138,12 @@ namespace lacam
       // success
       occupied_next[u->id] = i;
       Q_to[i] = u;
-      if (flg_swap && k == 0) swap_operation();
       return true;
     }
 
     // failed to secure node, remain at current location
     occupied_next[Q_from[i]->id] = i;
     Q_to[i] = Q_from[i];
-    return false;
-  }
-
-  int PIBT::is_swap_required_and_possible(const int i, const Config &Q_from,
-                                          Config &Q_to)
-  {
-    // agent-j occupying the desired vertex for agent-i
-    const auto j = occupied_now[C_next[i][0]->id];
-    if (j != NO_AGENT && j != i &&  // j exists
-        Q_to[j] == nullptr &&       // j does not decide next location
-        is_swap_required(i, j, Q_from, Q_from[i],
-                         Q_from[j]) &&          // swap required
-        is_swap_possible(Q_from[j], Q_from[i])  // swap possible
-    ) {
-      return j;
-    }
-
-    // for clear operation, c.f., push & swap
-    if (C_next[i][0] != Q_from[i]) {
-      for (auto u : Q_from[i]->neighbor) {
-        const auto k = occupied_now[u->id];
-        if (k != NO_AGENT &&              // k exists
-            C_next[i][0] != Q_from[k] &&  // this is for clear operation
-            is_swap_required(k, i, Q_from, Q_from[i],
-                             C_next[i][0]) &&  // emulating from one step ahead
-            is_swap_possible(C_next[i][0], Q_from[i])) {
-          return k;
-        }
-      }
-    }
-    return NO_AGENT;
-  }
-
-  bool PIBT::is_swap_required(const int pusher, const int puller,
-                              const Config &Q, Vertex *v_pusher_origin,
-                              Vertex *v_puller_origin)
-  {
-    auto v_pusher = v_pusher_origin;
-    auto v_puller = v_puller_origin;
-    Vertex *tmp = nullptr;
-    while (D->get(pusher, Q.goal_indices[pusher], v_puller) <
-           D->get(pusher, Q.goal_indices[pusher], v_pusher)) {
-      auto n = v_puller->neighbor.size();
-      // remove agents who need not to move
-      for (auto u : v_puller->neighbor) {
-        const auto i = occupied_now[u->id];
-        if (u == v_pusher ||
-            (u->neighbor.size() == 1 && i != NO_AGENT && ins->goals[i] == u)) {
-          --n;
-        } else {
-          tmp = u;
-        }
-      }
-      if (n >= 2) return false;  // able to swap at v_l
-      if (n <= 0) break;
-      v_pusher = v_puller;
-      v_puller = tmp;
-    }
-
-    return (D->get(puller, Q.goal_indices[puller], v_pusher) <
-            D->get(puller, Q.goal_indices[puller], v_puller)) &&
-           (D->get(pusher, Q.goal_indices[pusher], v_pusher) == 0 ||
-            D->get(pusher, Q.goal_indices[pusher], v_puller) <
-                D->get(pusher, Q.goal_indices[pusher], v_pusher));
-  }
-
-  bool PIBT::is_swap_possible(Vertex *v_pusher_origin, Vertex *v_puller_origin)
-  {
-    // simulate pull
-    auto v_pusher = v_pusher_origin;
-    auto v_puller = v_puller_origin;
-    Vertex *tmp = nullptr;
-    while (v_puller != v_pusher_origin) {  // avoid loop
-      auto n = v_puller->neighbor.size();
-      for (auto u : v_puller->neighbor) {
-        const auto i = occupied_now[u->id];
-        if (u == v_pusher ||
-            (u->neighbor.size() == 1 && i != NO_AGENT && ins->goals[i] == u)) {
-          --n;
-        } else {
-          tmp = u;
-        }
-      }
-      if (n >= 2) return true;  // able to swap at v_next
-      if (n <= 0) return false;
-      v_pusher = v_puller;
-      v_puller = tmp;
-    }
     return false;
   }
 

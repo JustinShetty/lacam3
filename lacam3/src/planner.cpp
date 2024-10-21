@@ -55,6 +55,7 @@ namespace lacam
         cost_initial_solution(-1),
         checkpoints()
   {
+    if (FLG_SWAP) throw std::runtime_error("FLG_SWAP not implemented");
   }
 
   Planner::~Planner()
@@ -352,34 +353,33 @@ namespace lacam
 
   Solution Planner::get_refined_plan(const Solution &plan)
   {
-    throw std::runtime_error("get_refined_plan not implemented");
-    //   auto MT_internal = std::mt19937(seed_refiner);
-    //   if (depth < 1 && plan.size() > 3 &&
-    //       get_random_float(MT_internal) < RECURSIVE_RATE) {
-    //     // recursive LaCAM
-    //     auto ins_tmp =
-    //         Instance(ins->G, plan[get_random_int(MT_internal, 1, plan.size()
-    //         - 2)],
-    //                  ins->goals, N);
-    //     auto deadline_tmp = Deadline(std::min(
-    //         RECURSIVE_TIME_LIMIT,
-    //         deadline == nullptr ? INT_MAX
-    //                             : deadline->time_limit_ms -
-    //                             elapsed_ms(deadline)));
-    //     auto planner_tmp =
-    //         Planner(&ins_tmp, 0, &deadline_tmp, seed_refiner, depth + 1, D);
-    //     info(4, verbose, deadline, "refiner-", planner_tmp.seed,
-    //          "\tactivated (recursive LaCAM)");
-    //     auto res = planner_tmp.solve();
-    //     info(4, verbose, deadline, "refiner-", planner_tmp.seed,
-    //          "\tcompleted (recursive LaCAM)");
-    //     return res;
-    //   } else if (RECURSIVE_RATE < 1.0) {
-    //     // iterative refinement
-    //     return refine(ins, deadline, plan, D, seed_refiner, verbose - 4);
-    //   } else {
-    //     return Solution();
-    //   }
+    // throw std::runtime_error("get_refined_plan not implemented");
+    auto MT_internal = std::mt19937(seed_refiner);
+    if (depth < 1 && plan.size() > 3 &&
+        get_random_float(MT_internal) < RECURSIVE_RATE) {
+      // recursive LaCAM
+      auto ins_tmp = Instance(
+          ins->G, plan[get_random_int(MT_internal, 1, plan.size() - 2)],
+          ins->goals, ins->goal_sequences, N);
+      auto deadline_tmp =
+          Deadline(std::min(RECURSIVE_TIME_LIMIT,
+                            deadline == nullptr ? INT_MAX
+                                                : deadline->time_limit_ms -
+                                                      elapsed_ms(deadline)));
+      auto planner_tmp = Planner(&ins_tmp, threshold, 0, &deadline_tmp,
+                                 seed_refiner, depth + 1, D);
+      info(4, verbose, deadline, "refiner-", planner_tmp.seed,
+           "\tactivated (recursive LaCAM)");
+      auto res = planner_tmp.solve();
+      info(4, verbose, deadline, "refiner-", planner_tmp.seed,
+           "\tcompleted (recursive LaCAM)");
+      return res;
+    } else if (RECURSIVE_RATE < 1.0) {
+      // iterative refinement
+      return refine(ins, deadline, plan, D, seed_refiner, verbose - 4);
+    } else {
+      return Solution();
+    }
   }
 
   void Planner::update_checkpoints()

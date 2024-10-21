@@ -19,8 +19,9 @@ namespace lacam
     const uint N;        // number of agents
     bool delete_graph_after_used;
 
-    // Instance(Graph *_G, const Config &_starts, const Config &_goals, uint
-    // _N);
+    Instance(Graph *_G, const Config &_starts, const Config &_goals,
+             const std::vector<std::vector<Vertex *>> &_goal_sequences,
+             uint _N);
     Instance(const std::string &map_filename,
              const std::vector<int> &start_indexes,
              const std::vector<int> &goal_indexes);

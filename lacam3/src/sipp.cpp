@@ -67,7 +67,8 @@ namespace lacam
             CollisionTable *CT, const Deadline *deadline,
             const int f_upper_bound)
   {
-    throw std::runtime_error("sipp not implemented");
+    return Path();
+    // throw std::runtime_error("sipp not implemented");
     // auto solution_path = Path();
     // auto ST = SITable(CT);  // safe interval table
 

@@ -8,11 +8,16 @@ namespace lacam
     if (delete_graph_after_used) delete G;
   }
 
-  // Instance::Instance(Graph *_G, const Config &_starts, const Config &_goals,
-  //                    uint _N)
-  //     : G(_G), starts(_starts), goals(_goals), N(_N)
-  // {
-  // }
+  Instance::Instance(Graph *_G, const Config &_starts, const Config &_goals,
+                     const std::vector<std::vector<Vertex *>> &_goal_sequences,
+                     uint _N)
+      : G(_G),
+        starts(_starts),
+        goals(_goals),
+        goal_sequences(_goal_sequences),
+        N(_N)
+  {
+  }
 
   Instance::Instance(const std::string &map_filename,
                      const std::vector<int> &start_indexes,
