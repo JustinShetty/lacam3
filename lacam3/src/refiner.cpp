@@ -7,6 +7,7 @@ namespace lacam
                   const Solution &solution, DistTableMultiGoal *D,
                   const int seed, const int verbose)
   {
+    throw std::runtime_error("refine not implemented");
     if (solution.empty()) return Solution();
     info(0, verbose, deadline, "refiner-", seed, "\tactivated");
     // setup

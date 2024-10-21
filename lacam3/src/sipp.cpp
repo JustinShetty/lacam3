@@ -67,8 +67,7 @@ namespace lacam
             CollisionTable *CT, const Deadline *deadline,
             const int f_upper_bound)
   {
-    return Path();
-    // throw std::runtime_error("sipp not implemented");
+    throw std::runtime_error("sipp not implemented");
     // auto solution_path = Path();
     // auto ST = SITable(CT);  // safe interval table
 
@@ -90,8 +89,7 @@ namespace lacam
     //     std::priority_queue<SINode *, SINodes, decltype(cmpNodes)>(cmpNodes);
     // std::unordered_map<SINode, SINode *, SINodeHasher> EXPLORED;
     // OPEN.push(new SINode(++node_id, ST.get(s_i)[0], s_i, 0, 0, D->get(i,
-    // s_i),
-    //                      nullptr));
+    // s_i), nullptr));
 
     // // main loop
     // while (!OPEN.empty() && !is_expired(deadline)) {
