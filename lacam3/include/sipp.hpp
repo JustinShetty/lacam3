@@ -19,6 +19,8 @@
 using SI = std::pair<int, int>;
 using SIs = std::vector<SI>;
 
+namespace lacam {
+
 struct SITable {
   std::unordered_map<int, SIs> body;
   CollisionTable *CT;
@@ -53,3 +55,5 @@ Path sipp(const int i, Vertex *s_i, Vertex *g_i, DistTableMultiGoal *D,
           const int f_upper_bound = INT_MAX);
 
 std::ostream &operator<<(std::ostream &os, const SINode *n);
+
+}  // namespace lacam

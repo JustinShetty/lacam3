@@ -14,6 +14,8 @@
 #include "graph.hpp"
 #include "utils.hpp"
 
+namespace lacam {
+
 struct Scatter {
   const Instance *ins;
   const Deadline *deadline;
@@ -40,3 +42,5 @@ struct Scatter {
           const Deadline *_deadline, const int seed = 0, int _verbose = 0,
           int _cost_margin = 2);
 };
+
+}  // namespace lacam

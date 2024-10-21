@@ -1,5 +1,7 @@
 #include "../include/refiner.hpp"
 
+namespace lacam {
+
 Solution refine(const Instance *ins, const Deadline *deadline,
                 const Solution &solution, DistTableMultiGoal *D, const int seed,
                 const int verbose)
@@ -67,3 +69,5 @@ Solution refine(const Instance *ins, const Deadline *deadline,
 
   return translatePathsToConfigs(paths);
 }
+
+}  // namespace lacam

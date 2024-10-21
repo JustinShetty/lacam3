@@ -3,6 +3,8 @@
 #include "../include/dist_table.hpp"
 #include "../include/planner.hpp"
 
+namespace lacam {
+
 bool is_feasible_solution(const Instance &ins, const Solution &solution,
                           const int threshold, const int verbose)
 {
@@ -137,3 +139,5 @@ void make_log(const Instance &ins, const Solution &solution,
   }
   log.close();
 }
+
+}  // namespace lacam

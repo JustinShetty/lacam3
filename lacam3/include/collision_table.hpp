@@ -7,6 +7,8 @@
 #include "instance.hpp"
 #include "utils.hpp"
 
+namespace lacam {
+
 struct CollisionTable {
   // vertex, time, agents
   std::vector<std::vector<std::vector<int>>> body;
@@ -23,3 +25,5 @@ struct CollisionTable {
   void clearPath(const int i, Path &path);
   void shrink();
 };
+
+}  // namespace lacam

@@ -2,6 +2,8 @@
 #include <iostream>
 #include <lacam.hpp>
 
+using namespace lacam;
+
 int main(int argc, char *argv[])
 {
   // arguments parser

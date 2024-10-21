@@ -1,5 +1,7 @@
 #include "../include/lnode.hpp"
 
+namespace lacam {
+
 int LNode::COUNT = 0;
 
 LNode::LNode() : who(), where(), depth(0) { ++COUNT; }
@@ -13,3 +15,5 @@ LNode::LNode(LNode *parent, int i, Vertex *v)
 }
 
 LNode::~LNode(){};
+
+} // namespace lacam

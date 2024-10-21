@@ -6,6 +6,8 @@
 
 #include "utils.hpp"
 
+namespace lacam {
+
 struct Vertex {
   const int id;     // index for V in Graph
   const int index;  // index for U (width * y + x) in Graph
@@ -95,3 +97,5 @@ std::ostream &operator<<(std::ostream &os, const Config &Q);
 std::ostream &operator<<(std::ostream &os, const Paths &paths);
 
 bool has_following_conflict(const Config &c_from, const Config &c_to);
+
+}  // namespace lacam

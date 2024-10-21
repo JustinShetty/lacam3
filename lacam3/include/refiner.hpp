@@ -24,6 +24,10 @@
 #include "translator.hpp"
 #include "utils.hpp"
 
+namespace lacam {
+
 Solution refine(const Instance *ins, const Deadline *deadline,
                 const Solution &solution, DistTableMultiGoal *D,
                 const int seed = 0, const int verbose = 0);
+
+}  // namespace lacam

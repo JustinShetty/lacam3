@@ -5,6 +5,8 @@
 
 #include "../include/post_processing.hpp"
 
+namespace lacam {
+
 bool Planner::FLG_SWAP = true;
 bool Planner::FLG_STAR = true;
 bool Planner::FLG_MULTI_THREAD = true;
@@ -407,3 +409,5 @@ void Planner::logging()
   info(1, verbose, deadline, "search iteration:", search_iter,
        "\texplored:", EXPLORED.size());
 }
+
+}  // namespace lacam

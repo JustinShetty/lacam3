@@ -25,6 +25,8 @@
 
 using Time = std::chrono::steady_clock;
 
+namespace lacam {
+
 // time manager
 struct Deadline {
   const Time::time_point t_s;
@@ -71,3 +73,5 @@ std::ostream &operator<<(std::ostream &os, const std::list<int> &arr);
 std::ostream &operator<<(std::ostream &os, const std::set<int> &arr);
 
 uint hash_combine(uint a, uint b);
+
+}  // namespace lacam

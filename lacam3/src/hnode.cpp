@@ -2,6 +2,8 @@
 
 #include <random>
 
+namespace lacam {
+
 int HNode::COUNT = 0;
 
 HNode::HNode(Config _C, DistTableMultiGoal *D, HNode *_parent, int _g, int _h)
@@ -87,3 +89,5 @@ bool CompareHNodePointers::operator()(const HNode *l, const HNode *r) const
   }
   return false;
 }
+
+} // namespace lacam

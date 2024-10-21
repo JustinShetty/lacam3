@@ -13,6 +13,8 @@
 #include "scatter.hpp"
 #include "utils.hpp"
 
+namespace lacam {
+
 struct PIBT {
   const Instance *ins;
   std::mt19937 MT;
@@ -48,4 +50,6 @@ struct PIBT {
   bool is_swap_required(const int pusher, const int puller, const Config &Q,
                         Vertex *v_pusher_origin, Vertex *v_puller_origin);
   bool is_swap_possible(Vertex *v_pusher_origin, Vertex *v_puller_origin);
+};
+
 };

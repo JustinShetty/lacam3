@@ -1,5 +1,7 @@
 #include "../include/dist_table.hpp"
 
+namespace lacam {
+
 DistTableMultiGoal::DistTableMultiGoal(const Instance *ins)
     : K(ins->G->V.size())
 {
@@ -47,3 +49,5 @@ int DistTableMultiGoal::get(const int i, const int goal_index,
   auto idx = std::min(goal_index, (int)(table[i].size() - 1));
   return table[i][idx][v_id];
 }
+
+}  // namespace lacam

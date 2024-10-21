@@ -7,6 +7,8 @@
 #include "instance.hpp"
 #include "utils.hpp"
 
+namespace lacam {
+
 struct DistTableMultiGoal {
   const int K;  // number of vertices
   std::vector<std::vector<std::vector<int>>>
@@ -25,3 +27,5 @@ struct DistTableMultiGoal {
 
   void setup(const Instance *ins);  // initialization
 };
+
+}  // namespace lacam

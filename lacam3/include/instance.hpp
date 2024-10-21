@@ -7,6 +7,8 @@
 #include "graph.hpp"
 #include "utils.hpp"
 
+namespace lacam {
+
 struct Instance {
   Graph *G;       // graph
   Config starts;  // initial configuration
@@ -39,3 +41,5 @@ struct Instance {
 
 // solution: a sequence of configurations
 using Solution = std::vector<Config>;
+
+}  // namespace lacam

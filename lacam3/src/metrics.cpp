@@ -1,5 +1,7 @@
 #include "../include/metrics.hpp"
 
+namespace lacam {
+
 int get_makespan(const Solution &solution)
 {
   if (solution.empty()) return 0;
@@ -120,3 +122,5 @@ int get_sum_of_costs_lower_bound(const Instance &ins,
   }
   return c;
 }
+
+} // namespace lacam

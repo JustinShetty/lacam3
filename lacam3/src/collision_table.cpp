@@ -1,5 +1,7 @@
 #include "../include/collision_table.hpp"
 
+namespace lacam {
+
 CollisionTable::CollisionTable(const Instance *ins)
     : body(ins->G->size()),
       body_last(ins->G->size()),
@@ -94,3 +96,5 @@ void CollisionTable::clearPath(const int i, Path &path)
     collision_cnt -= entry_body[t].size();
   }
 }
+
+}  // namespace lacam

@@ -1,5 +1,7 @@
 #include "../include/translator.hpp"
 
+namespace lacam {
+
 std::vector<Path> translateConfigsToPaths(const std::vector<Config> &configs)
 {
   const auto N = configs.front().size();
@@ -30,3 +32,5 @@ std::vector<Config> translatePathsToConfigs(const std::vector<Path> &paths)
   }
   return configs;
 }
+
+}  // namespace lacam

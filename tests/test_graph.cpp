@@ -1,6 +1,8 @@
 #include <cassert>
 #include <lacam.hpp>
 
+using namespace lacam;
+
 int main()
 {
   {

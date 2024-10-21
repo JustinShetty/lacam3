@@ -5,6 +5,8 @@
 #pragma once
 #include "graph.hpp"
 
+namespace lacam {
+
 // low-level search node
 struct LNode {
   static int COUNT;
@@ -16,3 +18,5 @@ struct LNode {
   LNode(LNode *parent, int i, Vertex *v);  // who and where
   ~LNode();
 };
+
+}  // namespace lacam

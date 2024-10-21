@@ -1,5 +1,7 @@
 #include "../include/pibt.hpp"
 
+namespace lacam {
+
 PIBT::PIBT(const Instance *_ins, DistTableMultiGoal *_D, int seed,
            bool _flg_swap, Scatter *_scatter)
     : ins(_ins),
@@ -252,3 +254,5 @@ bool PIBT::is_swap_possible(Vertex *v_pusher_origin, Vertex *v_puller_origin)
   }
   return false;
 }
+
+}  // namespace lacam

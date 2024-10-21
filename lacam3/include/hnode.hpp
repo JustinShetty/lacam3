@@ -7,6 +7,8 @@
 #include "dist_table.hpp"
 #include "lnode.hpp"
 
+namespace lacam {
+
 // high-level search node
 struct HNode;
 struct CompareHNodePointers {  // for determinism
@@ -39,3 +41,5 @@ struct HNode {
 using HNodes = std::vector<HNode *>;
 
 std::ostream &operator<<(std::ostream &os, const HNode *H);
+
+}; // namespace lacam

@@ -1,5 +1,7 @@
 #include "../include/sipp.hpp"
 
+namespace lacam {
+
 SITable::SITable(CollisionTable *_CT) : CT(_CT) {}
 
 SITable::~SITable() {}
@@ -177,3 +179,5 @@ std::ostream &operator<<(std::ostream &os, const SINode *n)
      << "]";
   return os;
 }
+
+} // namespace lacam

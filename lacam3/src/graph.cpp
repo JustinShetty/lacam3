@@ -1,5 +1,7 @@
 #include "../include/graph.hpp"
 
+namespace lacam {
+
 Vertex::Vertex(int _id, int _index, int _x, int _y)
     : id(_id), index(_index), x(_x), y(_y), neighbor()
 {
@@ -171,3 +173,5 @@ bool has_following_conflict(const Config &c_from, const Config &c_to)
   }
   return false;
 }
+
+}  // namespace lacam

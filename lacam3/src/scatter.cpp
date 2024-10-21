@@ -2,6 +2,8 @@
 
 #include "../include/metrics.hpp"
 
+namespace lacam {
+
 Scatter::Scatter(const Instance *_ins, DistTableMultiGoal *_D,
                  const Deadline *_deadline, const int seed, int _verbose,
                  int _cost_margin)
@@ -149,3 +151,5 @@ void Scatter::construct()
 
   info(0, verbose, deadline, "scatter", "\tcompleted");
 }
+
+} // namespace lacam

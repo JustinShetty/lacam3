@@ -27,6 +27,8 @@
 #include "translator.hpp"
 #include "utils.hpp"
 
+namespace lacam {
+
 struct Planner {
   const Instance *ins;
   const int threshold;
@@ -108,3 +110,5 @@ struct Planner {
   void update_checkpoints();
   void logging();
 };
+
+}  // namespace lacam

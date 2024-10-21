@@ -1,5 +1,7 @@
 #include "../include/instance.hpp"
 
+namespace lacam {
+
 Instance::~Instance()
 {
   if (delete_graph_after_used) delete G;
@@ -145,3 +147,5 @@ int Instance::get_total_goals() const
   }
   return total_goals;
 }
+
+} // namespace lacam

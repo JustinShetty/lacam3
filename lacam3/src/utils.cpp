@@ -1,5 +1,7 @@
 #include "../include/utils.hpp"
 
+namespace lacam {
+
 void info(const int level, const int verbose) { std::cout << std::endl; }
 
 Deadline::Deadline(double _time_limit_ms)
@@ -75,3 +77,5 @@ uint hash_combine(uint a, uint b)
   a ^= b + 0x9e3779b9 + (a << 6) + (a >> 2);
   return a;
 }
+
+}  // namespace lacam
