@@ -7,7 +7,6 @@ int main()
 {
   Planner::FLG_SWAP = false;
   Planner::FLG_STAR = false;
-  Planner::PIBT_NUM = 1;
 
   const int VERBOSITY = 0;
 
