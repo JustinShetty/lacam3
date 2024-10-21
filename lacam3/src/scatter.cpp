@@ -24,7 +24,7 @@ namespace lacam
   {
   }
 
-  void Scatter::construct()
+  void Scatter::construct(const std::vector<int> &goal_indices)
   {
     info(0, verbose, deadline, "scatter", "\tinvoked");
 
@@ -62,8 +62,8 @@ namespace lacam
         if (is_expired(deadline)) break;
 
         const auto i = order[_i];
-        // XXX
-        const auto cost_ub = D->get(i, 0, ins->starts[i]) + cost_margin;
+        const auto cost_ub =
+            D->get(i, goal_indices[i], ins->starts[i]) + cost_margin;
 
         if (!paths[i].empty()) sum_of_path_length -= (paths[i].size() - 1);
 
@@ -75,8 +75,9 @@ namespace lacam
                                         decltype(cmp)>(cmp);
         // used with CLOSED, vertex-id list
         const auto s_i = ins->starts[i];
-        // XXX
-        OPEN.push(std::make_tuple(s_i, 0, D->get(i, 0, s_i), 0, nullptr));
+
+        OPEN.push(std::make_tuple(s_i, 0, D->get(i, goal_indices[i], s_i), 0,
+                                  nullptr));
         auto USED = std::vector<int>();
 
         // A*
@@ -102,8 +103,7 @@ namespace lacam
 
           // expand
           for (auto u : v->neighbor) {
-            // XXX
-            auto d_u = D->get(i, 0, u);
+            auto d_u = D->get(i, goal_indices[i], u);
             if (u != s_i && CLOSED[u->id] == nullptr &&
                 d_u + g_v + 1 <= cost_ub) {
               // insert new node
