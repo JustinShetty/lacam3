@@ -7,9 +7,10 @@
 #include "metrics.hpp"
 #include "utils.hpp"
 
-namespace lacam {
+namespace lacam
+{
 
-std::vector<Path> translateConfigsToPaths(const std::vector<Config> &configs);
-std::vector<Config> translatePathsToConfigs(const std::vector<Path> &paths);
+  std::vector<Path> translateConfigsToPaths(const std::vector<Config> &configs);
+  std::vector<Config> translatePathsToConfigs(const std::vector<Path> &paths);
 
 }  // namespace lacam

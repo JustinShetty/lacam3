@@ -19,41 +19,42 @@
 using SI = std::pair<int, int>;
 using SIs = std::vector<SI>;
 
-namespace lacam {
+namespace lacam
+{
 
-struct SITable {
-  std::unordered_map<int, SIs> body;
-  CollisionTable *CT;
+  struct SITable {
+    std::unordered_map<int, SIs> body;
+    CollisionTable *CT;
 
-  SITable(CollisionTable *_CT);
-  ~SITable();
-  SIs &get(Vertex *v);
-};
+    SITable(CollisionTable *_CT);
+    ~SITable();
+    SIs &get(Vertex *v);
+  };
 
-struct SINode {
-  const int uuid;
-  const int time_start;
-  const int time_end;
-  Vertex *v;
-  const int t;  // arrival time
-  const int g;
-  const int f;
-  SINode *parent;
+  struct SINode {
+    const int uuid;
+    const int time_start;
+    const int time_end;
+    Vertex *v;
+    const int t;  // arrival time
+    const int g;
+    const int f;
+    SINode *parent;
 
-  SINode(const int uuid, const SI &si, Vertex *_v, int _t, int _g, int _f,
-         SINode *_parent);
-  bool operator==(const SINode &other) const;
-};
-using SINodes = std::vector<SINode *>;
+    SINode(const int uuid, const SI &si, Vertex *_v, int _t, int _g, int _f,
+           SINode *_parent);
+    bool operator==(const SINode &other) const;
+  };
+  using SINodes = std::vector<SINode *>;
 
-struct SINodeHasher {
-  uint operator()(const SINode &n) const;
-};
+  struct SINodeHasher {
+    uint operator()(const SINode &n) const;
+  };
 
-Path sipp(const int i, Vertex *s_i, Vertex *g_i, DistTableMultiGoal *D,
-          CollisionTable *CT, const Deadline *deadline = nullptr,
-          const int f_upper_bound = INT_MAX);
+  Path sipp(const int i, Vertex *s_i, Vertex *g_i, DistTableMultiGoal *D,
+            CollisionTable *CT, const Deadline *deadline = nullptr,
+            const int f_upper_bound = INT_MAX);
 
-std::ostream &operator<<(std::ostream &os, const SINode *n);
+  std::ostream &operator<<(std::ostream &os, const SINode *n);
 
 }  // namespace lacam
