@@ -43,3 +43,7 @@ Manifest.toml
 map
 scen
 **/local/
+# when its built as a library
+lacam3/CMakeFiles/
+lacam3/Makefile
+lacam3/cmake_install.cmake
