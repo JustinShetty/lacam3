@@ -44,8 +44,17 @@ namespace lacam
         goals(Config()),
         N(start_indexes.size())
   {
+    if (start_indexes.size() != N) {
+      throw std::invalid_argument("start_indexes and N size mismatch");
+    }
+    if (goal_index_sequences.size() != N) {
+      throw std::invalid_argument("goal_index_sequences and N size mismatch");
+    }
     for (auto k : start_indexes) starts.push_back(G->U[k], 0);
     for (auto goal_sequence : goal_index_sequences) {
+      if (goal_sequence.empty()) {
+        throw std::invalid_argument("encountered empty goal_sequence");
+      }
       std::vector<Vertex *> as_vertices;
       for (auto k : goal_sequence) as_vertices.push_back(G->U[k]);
       goal_sequences.push_back(as_vertices);
