@@ -21,7 +21,7 @@ namespace lacam
   bool Planner::FLG_RANDOM_INSERT_INIT_NODE = false;
   float Planner::RECURSIVE_RATE = 0.2;
   double Planner::RECURSIVE_TIME_LIMIT = 1000;
-  bool Planner::ALLOW_FOLLOWING = false;
+  bool Planner::FLG_ALLOW_FOLLOWING = false;
 
   std::string Planner::MSG;
   int Planner::CHECKPOINTS_DURATION = 5000;
@@ -289,7 +289,8 @@ namespace lacam
       Q.pop();
       for (auto n_to : n_from->neighbor) {
         auto g_val = n_from->g + get_edge_cost(n_from->C, n_to->C);
-        if (g_val < n_to->g && !has_following_conflict(n_from->C, n_to->C)) {
+        bool conflict_free = FLG_ALLOW_FOLLOWING ? true : !has_following_conflict(n_from->C, n_to->C);
+        if (g_val < n_to->g && conflict_free) {
           if (n_to == H_goal)
             info(2, verbose, deadline, "cost update: ", H_goal->g, " -> ",
                  g_val);
@@ -336,7 +337,7 @@ namespace lacam
   void Planner::set_pibt()
   {
     for (auto k = 0; k < PIBT_NUM; ++k) {
-      pibts.emplace_back(new PIBT(ins, D, k + seed, FLG_SWAP, scatter));
+      pibts.emplace_back(new PIBT(ins, D, k + seed, FLG_SWAP, scatter, FLG_ALLOW_FOLLOWING));
     }
   }
 

@@ -38,8 +38,11 @@ namespace lacam
     // scatter
     Scatter *scatter;
 
+    // whether following conflicts are allowed
+    bool allow_following;
+
     PIBT(const Instance *_ins, DistTableMultiGoal *_D, int seed = 0,
-         bool _flg_swap = true, Scatter *_scatter = nullptr);
+         bool _flg_swap = true, Scatter *_scatter = nullptr, bool _allow_following = false);
     ~PIBT();
 
     bool set_new_config(const Config &Q_from, Config &Q_to,

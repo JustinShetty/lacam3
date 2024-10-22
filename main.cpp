@@ -137,7 +137,7 @@ int main(int argc, char *argv[])
           : std::stof(program.get<std::string>("recursive-time-limit")) * 1000;
   Planner::CHECKPOINTS_DURATION =
       std::stof(program.get<std::string>("checkpoints-duration")) * 1000;
-  Planner::ALLOW_FOLLOWING = program.get<bool>("allow_following");
+  Planner::FLG_ALLOW_FOLLOWING = program.get<bool>("allow_following");
 
   // solve
   const auto deadline = Deadline(time_limit_sec * 1000);
@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
 
   // check feasibility
   if (!is_feasible_solution(ins, solution, ins.get_total_goals(),
-                            Planner::ALLOW_FOLLOWING, verbose)) {
+                            Planner::FLG_ALLOW_FOLLOWING, verbose)) {
     info(0, verbose, &deadline, "invalid solution");
     return 1;
   }

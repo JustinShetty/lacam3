@@ -4,7 +4,7 @@ namespace lacam
 {
 
   PIBT::PIBT(const Instance *_ins, DistTableMultiGoal *_D, int seed,
-             bool _flg_swap, Scatter *_scatter)
+             bool _flg_swap, Scatter *_scatter, bool _allow_following)
       : ins(_ins),
         MT(std::mt19937(seed)),
         N(ins->N),
@@ -16,7 +16,8 @@ namespace lacam
         C_next(N, std::array<Vertex *, 5>()),
         tie_breakers(V_size, 0),
         flg_swap(_flg_swap),
-        scatter(_scatter)
+        scatter(_scatter),
+        allow_following(_allow_following)
   {
   }
 
@@ -41,11 +42,20 @@ namespace lacam
           success = false;
           break;
         }
-        // following conflict
-        if (occupied_now[Q_to[i]->id] != NO_AGENT &&
-            occupied_now[Q_to[i]->id] != i) {
-          success = false;
-          break;
+        if (allow_following) {
+          // swap conflict
+          auto j = occupied_now[Q_to[i]->id];
+          if (j != NO_AGENT && j != i && Q_to[j] == Q_from[i]) {
+            success = false;
+            break;
+          }
+        } else {
+          // following conflict
+          if (occupied_now[Q_to[i]->id] != NO_AGENT &&
+              occupied_now[Q_to[i]->id] != i) {
+            success = false;
+            break;
+          }
         }
         occupied_next[Q_to[i]->id] = i;
       }
@@ -90,7 +100,7 @@ namespace lacam
       tie_breakers[u->id] = get_random_float(MT);  // set tie-breaker
     }
     size_t num_candidates = K;
-    if (i_caller == NO_AGENT) {
+    if (i_caller == NO_AGENT || allow_following) {
       C_next[i][K] = Q_from[i];
       num_candidates++;
     }
@@ -114,31 +124,47 @@ namespace lacam
 
       // avoid following conflicts
       const auto j = occupied_now[u->id];
-      if (j != NO_AGENT && j != i) {
-        if (Q_to[j] == nullptr) {
-          // preemptively reserve current location
-          if (occupied_next[Q_from[i]->id] != NO_AGENT) {
-            info(1, 1, "agent-", i, " trying to preemptively reserve vertex-",
-                 u->id, ", but it is already reserved by agent-",
-                 occupied_next[Q_from[i]->id]);
-            return false;
+      if (allow_following) {
+        // avoid swap conflicts with constraints
+        if (j != NO_AGENT && Q_to[j] == Q_from[i]) continue;
+
+        // reserve next location
+        occupied_next[u->id] = i;
+        Q_to[i] = u;
+
+        // priority inheritance
+        if (j != NO_AGENT && u != Q_from[i] && Q_to[j] == nullptr &&
+            !funcPIBT(j, NO_AGENT, Q_from, Q_to))
+          continue;
+
+        // success to plan next one step
+        return true;
+      } else {
+        if (j != NO_AGENT && j != i) {
+          if (Q_to[j] == nullptr) {
+            // preemptively reserve current location
+            if (occupied_next[Q_from[i]->id] != NO_AGENT) {
+              info(1, 1, "agent-", i, " trying to preemptively reserve vertex-",
+                  u->id, ", but it is already reserved by agent-",
+                  occupied_next[Q_from[i]->id]);
+              return false;
+            }
+            occupied_next[Q_from[i]->id] = i;
+            Q_to[i] = Q_from[i];
+
+            if (funcPIBT(j, i, Q_from, Q_to)) return true;
+
+            // revert if priority inheritance failed
+            occupied_next[Q_from[i]->id] = NO_AGENT;
+            Q_to[i] = nullptr;
           }
-          occupied_next[Q_from[i]->id] = i;
-          Q_to[i] = Q_from[i];
-
-          if (funcPIBT(j, i, Q_from, Q_to)) return true;
-
-          // revert if priority inheritance failed
-          occupied_next[Q_from[i]->id] = NO_AGENT;
-          Q_to[i] = nullptr;
+          continue;
         }
-        continue;
+        // success
+        occupied_next[u->id] = i;
+        Q_to[i] = u;
+        return true;
       }
-
-      // success
-      occupied_next[u->id] = i;
-      Q_to[i] = u;
-      return true;
     }
 
     // failed to secure node, remain at current location

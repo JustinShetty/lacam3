@@ -82,7 +82,7 @@ namespace lacam
     static bool FLG_RANDOM_INSERT_INIT_NODE;
     static float RECURSIVE_RATE;
     static double RECURSIVE_TIME_LIMIT;
-    static bool ALLOW_FOLLOWING;
+    static bool FLG_ALLOW_FOLLOWING;
 
     // for logging
     static int CHECKPOINTS_DURATION;
