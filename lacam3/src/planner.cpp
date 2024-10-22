@@ -21,6 +21,7 @@ namespace lacam
   bool Planner::FLG_RANDOM_INSERT_INIT_NODE = false;
   float Planner::RECURSIVE_RATE = 0.2;
   double Planner::RECURSIVE_TIME_LIMIT = 1000;
+  bool Planner::ALLOW_FOLLOWING = false;
 
   std::string Planner::MSG;
   int Planner::CHECKPOINTS_DURATION = 5000;

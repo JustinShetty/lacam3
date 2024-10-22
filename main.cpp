@@ -82,6 +82,10 @@ int main(int argc, char *argv[])
   program.add_argument("--checkpoints-duration")
       .help("for recording")
       .default_value(std::string("5"));
+  program.add_argument("-f", "--allow_following")
+      .help("allow following conflicts")
+      .default_value(false)
+      .implicit_value(true);
   try {
     program.parse_known_args(argc, argv);
   } catch (const std::runtime_error &err) {
@@ -133,6 +137,7 @@ int main(int argc, char *argv[])
           : std::stof(program.get<std::string>("recursive-time-limit")) * 1000;
   Planner::CHECKPOINTS_DURATION =
       std::stof(program.get<std::string>("checkpoints-duration")) * 1000;
+  Planner::ALLOW_FOLLOWING = program.get<bool>("allow_following");
 
   // solve
   const auto deadline = Deadline(time_limit_sec * 1000);
@@ -144,7 +149,8 @@ int main(int argc, char *argv[])
   if (solution.empty()) info(1, verbose, &deadline, "failed to solve");
 
   // check feasibility
-  if (!is_feasible_solution(ins, solution, ins.get_total_goals(), verbose)) {
+  if (!is_feasible_solution(ins, solution, ins.get_total_goals(),
+                            Planner::ALLOW_FOLLOWING, verbose)) {
     info(0, verbose, &deadline, "invalid solution");
     return 1;
   }

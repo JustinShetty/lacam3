@@ -7,7 +7,8 @@ namespace lacam
 {
 
   bool is_feasible_solution(const Instance &ins, const Solution &solution,
-                            const int threshold, const int verbose)
+                            const int threshold, const bool allow_following,
+                            const int verbose)
   {
     if (solution.empty()) return true;
 
@@ -46,16 +47,28 @@ namespace lacam
             return false;
           }
 
-          // following conflicts
-          if (v_i_to == v_j_from) {
-            info(1, verbose, "following conflict: agent-", i, " follows agent-",
-                 j, " onto vertex-", v_i_to->id, " at timestep ", t);
-            return false;
-          }
-          if (v_j_to == v_i_from) {
-            info(1, verbose, "following conflict: agent-", j, " follows agent-",
-                 i, " onto vertex-", v_j_to->id, " at timestep ", t);
-            return false;
+          if (allow_following) {
+            // vertex conflicts
+            if (v_j_to == v_i_to) {
+              info(1, verbose, "vertex conflict between agent-", i,
+                   " and agent-", j, " at vertex-", v_i_to->id, " at timestep ",
+                   t);
+              return false;
+            }
+          } else {
+            // following conflicts
+            if (v_i_to == v_j_from) {
+              info(1, verbose, "following conflict: agent-", i,
+                   " follows agent-", j, " onto vertex-", v_i_to->id,
+                   " at timestep ", t);
+              return false;
+            }
+            if (v_j_to == v_i_from) {
+              info(1, verbose, "following conflict: agent-", j,
+                   " follows agent-", i, " onto vertex-", v_j_to->id,
+                   " at timestep ", t);
+              return false;
+            }
           }
         }
       }
