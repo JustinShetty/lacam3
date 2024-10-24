@@ -37,7 +37,7 @@ namespace lacam
     // collision data
     CollisionTable CT;
 
-    void construct(const std::vector<int> &goal_indices);
+    void construct();
 
     Scatter(const Instance *_ins, DistTableMultiGoal *_D,
             const Deadline *_deadline, const int seed = 0, int _verbose = 0,

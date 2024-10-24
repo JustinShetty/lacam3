@@ -24,13 +24,25 @@ namespace lacam
   {
   }
 
-  void Scatter::construct(const std::vector<int> &goal_indices)
+  void Scatter::construct()
   {
     info(0, verbose, deadline, "scatter", "\tinvoked");
 
     // define path finding utilities
     struct ScatterNode {
+      ScatterNode(Vertex *_vertex, int _goal_index, int _cost_to_come,
+                  int _cost_to_go, int _collision, Vertex *_parent)
+          : vertex(_vertex),
+            goal_index(_goal_index),
+            cost_to_come(_cost_to_come),
+            cost_to_go(_cost_to_go),
+            collision(_collision),
+            parent(_parent)
+      {
+      }
+
       Vertex *vertex;
+      int goal_index;
       int cost_to_come;
       int cost_to_go;
       int collision;
@@ -38,8 +50,7 @@ namespace lacam
     };
     auto cmp = [&](ScatterNode &a, ScatterNode &b) {
       // collision
-      if (a.collision != b.collision) 
-        return a.collision > b.collision;
+      if (a.collision != b.collision) return a.collision > b.collision;
       auto f_a = a.cost_to_come + a.cost_to_go;
       auto f_b = b.cost_to_come + b.cost_to_go;
       if (f_a != f_b) return f_a > f_b;
@@ -67,8 +78,14 @@ namespace lacam
         if (is_expired(deadline)) break;
 
         const auto i = order[_i];
-        const auto cost_ub =
-            D->get(i, goal_indices[i], ins->starts[i]) + cost_margin;
+
+        // upper bound of cost for entire goal sequence
+        auto cost_ub = D->get(i, 0, ins->starts[i]) + cost_margin;
+        for (size_t goal_idx = 1; goal_idx < ins->goal_sequences[i].size();
+             ++goal_idx) {
+          const auto prev_goal = ins->goal_sequences[i][goal_idx - 1];
+          cost_ub += D->get(i, goal_idx, prev_goal) + cost_margin;
+        }
 
         if (!paths[i].empty()) sum_of_path_length -= (paths[i].size() - 1);
 
@@ -81,11 +98,11 @@ namespace lacam
         // used with CLOSED, vertex-id list
         const auto s_i = ins->starts[i];
 
-        OPEN.push(ScatterNode({s_i, 0, D->get(i, goal_indices[i], s_i), 0,
-                               nullptr}));
+        OPEN.push(ScatterNode(s_i, 0, 0, D->get(i, 0, s_i), 0, nullptr));
         auto USED = std::vector<int>();
 
-        // A*
+        // Multi-Label A*
+        // arbitrary number of labels (from RHCR paper)
         auto solved = false;
         while (!OPEN.empty() && !is_expired(deadline)) {
           // pop
@@ -100,19 +117,24 @@ namespace lacam
           CLOSED[v->id] = node.parent;
           USED.push_back(v->id);
 
-          // check goal condition
-          if (v == ins->goals[i]) {
-            solved = true;
-            break;
+          // update goal index
+          if (v == ins->goal_sequences[i][node.goal_index]) {
+            node.goal_index++;
+            // check goal condition
+            if (node.goal_index == ins->goal_sequences[i].size()) {
+              solved = true;
+              break;
+            }
           }
 
           // expand
           for (auto u : v->neighbor) {
-            auto d_u = D->get(i, goal_indices[i], u);
+            auto d_u = D->get(i, 0, u);
             if (u != s_i && CLOSED[u->id] == nullptr &&
                 d_u + g_v + 1 <= cost_ub) {
               // insert new node
-              OPEN.push(ScatterNode({u, g_v + 1, d_u, CT.getCollisionCost(v, u, g_v) + c_v, v}));
+              OPEN.push(ScatterNode(u, node.goal_index, g_v + 1, d_u,
+                                    CT.getCollisionCost(v, u, g_v) + c_v, v));
             }
           }
         }

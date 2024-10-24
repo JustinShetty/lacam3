@@ -326,8 +326,7 @@ namespace lacam
     auto margin =
         SCATTER_MARGIN < 0 ? get_random_int(MT, 0, 30) : SCATTER_MARGIN;
     scatter = new Scatter(ins, D, &scatter_deadline, 3, verbose - 4, margin);
-    // XXX
-    scatter->construct(ins->starts.goal_indices);
+    scatter->construct();
     info(1, verbose, deadline, "finish computing SUO",
          ", collision count: ", scatter->CT.collision_cnt,
          ", scatter margin: ", scatter->cost_margin,
