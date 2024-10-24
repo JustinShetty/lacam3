@@ -3,7 +3,7 @@
 #include "../include/metrics.hpp"
 
 namespace lacam
-{  
+{
 
   Scatter::Scatter(const Instance *_ins, DistTableMultiGoal *_D,
                    const Deadline *_deadline, const int seed, int _verbose,
@@ -29,18 +29,31 @@ namespace lacam
     info(0, verbose, deadline, "scatter", "\tinvoked");
 
     // define path finding utilities
-    struct ScatterNode {
-      Vertex *vertex;
+    struct SingleAgentConfig {
+      Vertex *v;
       int goal_index;
+
+      SingleAgentConfig(Vertex *_v, int _goal_index)
+          : v(_v), goal_index(_goal_index)
+      {
+      }
+
+      bool operator==(const SingleAgentConfig &other) const
+      {
+        return v == other.v && goal_index == other.goal_index;
+      }
+    };
+
+    struct ScatterNode {
+      SingleAgentConfig config;
       int cost_to_come;
       int cost_to_go;
       int collision;
       ScatterNode *parent;
 
-      ScatterNode(Vertex *_vertex, int _goal_index, int _cost_to_come,
-                  int _cost_to_go, int _collision, ScatterNode *_parent)
-          : vertex(_vertex),
-            goal_index(_goal_index),
+      ScatterNode(SingleAgentConfig _config, int _cost_to_come, int _cost_to_go,
+                  int _collision, ScatterNode *_parent)
+          : config(_config),
             cost_to_come(_cost_to_come),
             cost_to_go(_cost_to_go),
             collision(_collision),
@@ -48,33 +61,19 @@ namespace lacam
       {
       }
     };
-    auto cmp = [&](ScatterNode* a, ScatterNode* b) {
+    auto cmp = [&](ScatterNode *a, ScatterNode *b) {
       // collision
       if (a->collision != b->collision) return a->collision > b->collision;
       auto f_a = a->cost_to_come + a->cost_to_go;
       auto f_b = b->cost_to_come + b->cost_to_go;
       if (f_a != f_b) return f_a > f_b;
-      return a->vertex->id < b->vertex->id;
+      return a->config.v->id < b->config.v->id;
     };
 
-    struct SingleAgentConfig {
-      int v_id;
-      int goal_index;
-
-      SingleAgentConfig(int _v_id, int _goal_index)
-          : v_id(_v_id), goal_index(_goal_index)
-      {
-      }
-
-      bool operator==(const SingleAgentConfig &other) const
-      {
-        return v_id == other.v_id && goal_index == other.goal_index;
-      }
-    };
     struct SingleAgentConfigHasher {
       std::size_t operator()(const SingleAgentConfig &config) const
       {
-        return hash_two_ints(config.v_id, config.goal_index);
+        return hash_two_ints(config.v->id, config.goal_index);
       }
     };
 
@@ -113,11 +112,14 @@ namespace lacam
         CT.clearPath(i, paths[i]);
 
         // setup A*
-        auto OPEN = std::priority_queue<ScatterNode*, std::vector<ScatterNode*>,
-                                        decltype(cmp)>(cmp);
+        auto OPEN =
+            std::priority_queue<ScatterNode *, std::vector<ScatterNode *>,
+                                decltype(cmp)>(cmp);
         const auto s_i = ins->starts[i];
-        OPEN.push(new ScatterNode(s_i, 0, 0, D->get(i, 0, s_i), 0, nullptr));
-        auto CLOSED = std::unordered_map<SingleAgentConfig, ScatterNode*, SingleAgentConfigHasher>();
+        OPEN.push(new ScatterNode(SingleAgentConfig(s_i, 0), 0,
+                                  D->get(i, 0, s_i), 0, nullptr));
+        auto CLOSED = std::unordered_map<SingleAgentConfig, ScatterNode *,
+                                         SingleAgentConfigHasher>();
 
         // Multi-Label A*
         // arbitrary number of labels (from RHCR paper)
@@ -127,22 +129,22 @@ namespace lacam
           OPEN.pop();
 
           // check CLOSED list
-          const auto v = node->vertex;
-          const auto gi = node->goal_index;
+          const auto v = node->config.v;
+          const auto gi = node->config.goal_index;
           const auto g_v = node->cost_to_come;
           const auto c_v = node->collision;
-          const auto sa_c = SingleAgentConfig(v->id, gi);
-          if (CLOSED[sa_c] != nullptr) continue;
-          CLOSED[sa_c] = node;
+
+          if (CLOSED[node->config] != nullptr) continue;
+          CLOSED[node->config] = node;
 
           // update goal index
           if (v == ins->goal_sequences[i][gi]) {
-            node->goal_index++;
-            
+            node->config.goal_index++;
+
             // check goal condition
-            if (node->goal_index == ins->goal_sequences[i].size()) {             
+            if (node->config.goal_index == ins->goal_sequences[i].size()) {
               while (node != nullptr) {
-                paths[i].push_back(node->vertex);
+                paths[i].push_back(node->config.v);
                 node = node->parent;
               }
               std::reverse(paths[i].begin(), paths[i].end());
@@ -152,12 +154,12 @@ namespace lacam
 
           // expand
           for (auto u : v->neighbor) {
-            auto d_u = D->get(i, node->goal_index, u);
-            auto sa_c = SingleAgentConfig(u->id, node->goal_index);
-            if (CLOSED[sa_c] == nullptr && d_u + g_v + 1 <= cost_ub) {
+            auto d_u = D->get(i, node->config.goal_index, u);
+            auto c = SingleAgentConfig(u, node->config.goal_index);
+            if (CLOSED[c] == nullptr && d_u + g_v + 1 <= cost_ub) {
               // insert new node
-              OPEN.push(new ScatterNode(u, node->goal_index, g_v + 1, d_u,
-                                        CT.getCollisionCost(v, u, g_v) + c_v, node));
+              OPEN.push(new ScatterNode(
+                  c, g_v + 1, d_u, CT.getCollisionCost(v, u, g_v) + c_v, node));
             }
           }
         }

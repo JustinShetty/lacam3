@@ -20,7 +20,7 @@ int main()
     const auto sc_margin = 0;
     Scatter sc = Scatter(&ins, &D, nullptr, 0, VERBOSITY, sc_margin);
     sc.construct();
-    
+
     for (int i = 0; i < ins.N; ++i) {
       std::cout << "sc.paths[" << i << "]: ";
       for (const auto& v : sc.paths[i]) {
