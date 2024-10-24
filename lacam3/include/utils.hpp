@@ -73,6 +73,6 @@ namespace lacam
   std::ostream &operator<<(std::ostream &os, const std::list<int> &arr);
   std::ostream &operator<<(std::ostream &os, const std::set<int> &arr);
 
-  uint hash_combine(uint a, uint b);
+  uint hash_two_ints(uint a, uint b);
 
 }  // namespace lacam
