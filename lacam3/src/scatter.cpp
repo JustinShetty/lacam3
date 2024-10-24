@@ -29,16 +29,21 @@ namespace lacam
     info(0, verbose, deadline, "scatter", "\tinvoked");
 
     // define path finding utilities
-    // vertex, cost-to-come, cost-to-go, collision, parent
-    using ScatterNode = std::tuple<Vertex *, int, int, int, Vertex *>;
+    struct ScatterNode {
+      Vertex *vertex;
+      int cost_to_come;
+      int cost_to_go;
+      int collision;
+      Vertex *parent;
+    };
     auto cmp = [&](ScatterNode &a, ScatterNode &b) {
       // collision
-      if (std::get<3>(a) != std::get<3>(b))
-        return std::get<3>(a) > std::get<3>(b);
-      auto f_a = std::get<1>(a) + std::get<2>(a);
-      auto f_b = std::get<1>(b) + std::get<2>(b);
+      if (a.collision != b.collision) 
+        return a.collision > b.collision;
+      auto f_a = a.cost_to_come + a.cost_to_go;
+      auto f_b = b.cost_to_come + b.cost_to_go;
       if (f_a != f_b) return f_a > f_b;
-      return std::get<0>(a)->id < std::get<0>(b)->id;
+      return a.vertex->id < b.vertex->id;
     };
     auto CLOSED = std::vector<Vertex *>(V_size, nullptr);  // parent
 
@@ -76,8 +81,8 @@ namespace lacam
         // used with CLOSED, vertex-id list
         const auto s_i = ins->starts[i];
 
-        OPEN.push(std::make_tuple(s_i, 0, D->get(i, goal_indices[i], s_i), 0,
-                                  nullptr));
+        OPEN.push(ScatterNode({s_i, 0, D->get(i, goal_indices[i], s_i), 0,
+                               nullptr}));
         auto USED = std::vector<int>();
 
         // A*
@@ -88,11 +93,11 @@ namespace lacam
           OPEN.pop();
 
           // check CLOSED list
-          const auto v = std::get<0>(node);
-          const auto g_v = std::get<1>(node);  // cost-to-come
-          const auto c_v = std::get<3>(node);  // collision
+          const auto v = node.vertex;
+          const auto g_v = node.cost_to_come;
+          const auto c_v = node.collision;
           if (CLOSED[v->id] != nullptr) continue;
-          CLOSED[v->id] = std::get<4>(node);  // parent
+          CLOSED[v->id] = node.parent;
           USED.push_back(v->id);
 
           // check goal condition
@@ -107,8 +112,7 @@ namespace lacam
             if (u != s_i && CLOSED[u->id] == nullptr &&
                 d_u + g_v + 1 <= cost_ub) {
               // insert new node
-              OPEN.push(std::make_tuple(
-                  u, g_v + 1, d_u, CT.getCollisionCost(v, u, g_v) + c_v, v));
+              OPEN.push(ScatterNode({u, g_v + 1, d_u, CT.getCollisionCost(v, u, g_v) + c_v, v}));
             }
           }
         }
