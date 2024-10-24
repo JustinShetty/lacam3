@@ -4,7 +4,7 @@ namespace lacam
 {
 
   PIBT::PIBT(const Instance *_ins, DistTableMultiGoal *_D, int seed,
-             bool _flg_swap, Scatter *_scatter, bool _allow_following)
+             Scatter *_scatter, bool _allow_following)
       : ins(_ins),
         MT(std::mt19937(seed)),
         N(ins->N),
@@ -15,7 +15,6 @@ namespace lacam
         occupied_next(V_size, NO_AGENT),
         C_next(N, std::array<Vertex *, 5>()),
         tie_breakers(V_size, 0),
-        flg_swap(_flg_swap),
         scatter(_scatter),
         allow_following(_allow_following)
   {

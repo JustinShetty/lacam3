@@ -32,9 +32,6 @@ namespace lacam
     std::vector<std::array<Vertex *, 5>> C_next;  // next location candidates
     std::vector<float> tie_breakers;              // random values, used in PIBT
 
-    // swap, used in the LaCAM* paper
-    bool flg_swap;
-
     // scatter
     Scatter *scatter;
 
@@ -42,7 +39,7 @@ namespace lacam
     bool allow_following;
 
     PIBT(const Instance *_ins, DistTableMultiGoal *_D, int seed = 0,
-         bool _flg_swap = true, Scatter *_scatter = nullptr, bool _allow_following = false);
+         Scatter *_scatter = nullptr, bool _allow_following = false);
     ~PIBT();
 
     bool set_new_config(const Config &Q_from, Config &Q_to,

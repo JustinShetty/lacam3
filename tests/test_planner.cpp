@@ -5,7 +5,6 @@ using namespace lacam;
 
 int main()
 {
-  Planner::FLG_SWAP = false;
   Planner::FLG_STAR = false;
 
   const int VERBOSITY = 0;

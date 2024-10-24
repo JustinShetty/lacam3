@@ -65,7 +65,6 @@ namespace lacam
     HNode *H_goal;  // goal node
 
     // parameters
-    static bool FLG_SWAP;  // whether to use swap technique in PIBT
     static bool FLG_STAR;  // whether to refine solutions after initial solution
                            // discovery
     static bool FLG_MULTI_THREAD;

@@ -8,7 +8,6 @@
 namespace lacam
 {
 
-  bool Planner::FLG_SWAP = true;
   bool Planner::FLG_STAR = true;
   bool Planner::FLG_MULTI_THREAD = true;
   int Planner::SCATTER_MARGIN = 10;
@@ -56,7 +55,6 @@ namespace lacam
         cost_initial_solution(-1),
         checkpoints()
   {
-    if (FLG_SWAP) throw std::runtime_error("FLG_SWAP not implemented");
   }
 
   Planner::~Planner()
@@ -337,7 +335,7 @@ namespace lacam
   void Planner::set_pibt()
   {
     for (auto k = 0; k < PIBT_NUM; ++k) {
-      pibts.emplace_back(new PIBT(ins, D, k + seed, FLG_SWAP, scatter, FLG_ALLOW_FOLLOWING));
+      pibts.emplace_back(new PIBT(ins, D, k + seed, scatter, FLG_ALLOW_FOLLOWING));
     }
   }
 
