@@ -144,8 +144,8 @@ namespace lacam
             // preemptively reserve current location
             if (occupied_next[Q_from[i]->id] != NO_AGENT) {
               info(1, 1, "agent-", i, " trying to preemptively reserve vertex-",
-                  u->id, ", but it is already reserved by agent-",
-                  occupied_next[Q_from[i]->id]);
+                   u->id, ", but it is already reserved by agent-",
+                   occupied_next[Q_from[i]->id]);
               return false;
             }
             occupied_next[Q_from[i]->id] = i;

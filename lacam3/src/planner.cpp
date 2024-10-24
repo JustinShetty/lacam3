@@ -287,7 +287,9 @@ namespace lacam
       Q.pop();
       for (auto n_to : n_from->neighbor) {
         auto g_val = n_from->g + get_edge_cost(n_from->C, n_to->C);
-        bool conflict_free = FLG_ALLOW_FOLLOWING ? true : !has_following_conflict(n_from->C, n_to->C);
+        bool conflict_free = FLG_ALLOW_FOLLOWING
+                                 ? true
+                                 : !has_following_conflict(n_from->C, n_to->C);
         if (g_val < n_to->g && conflict_free) {
           if (n_to == H_goal)
             info(2, verbose, deadline, "cost update: ", H_goal->g, " -> ",
@@ -335,7 +337,8 @@ namespace lacam
   void Planner::set_pibt()
   {
     for (auto k = 0; k < PIBT_NUM; ++k) {
-      pibts.emplace_back(new PIBT(ins, D, k + seed, scatter, FLG_ALLOW_FOLLOWING));
+      pibts.emplace_back(
+          new PIBT(ins, D, k + seed, scatter, FLG_ALLOW_FOLLOWING));
     }
   }
 
