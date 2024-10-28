@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
   program.add_argument("--checkpoints-duration")
       .help("for recording")
       .default_value(std::string("5"));
-  program.add_argument("-f", "--allow_following")
+  program.add_argument("-f", "--allow-following")
       .help("allow following conflicts")
       .default_value(false)
       .implicit_value(true);
