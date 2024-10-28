@@ -52,5 +52,30 @@ int main()
     assert(sc.paths[0].size() == 5);
   }
 
+  // two agents, two goals each
+  {
+    const auto map_filename = "../assets/empty-8-8.map";
+    // upper left corner
+    //  0  1  2
+    //  8  9 10
+    // 16 17 18
+
+    const std::vector<int> starts = {8, 17};
+    std::vector<std::vector<int>> goal_sequences = {{18, 8}, {1, 17}};
+    const auto ins = Instance(map_filename, starts, goal_sequences);
+    assert(ins.is_valid(VERBOSITY));
+
+    DistTableMultiGoal D = DistTableMultiGoal(&ins);
+    const auto sc_margin = 4;
+    Scatter sc = Scatter(&ins, &D, nullptr, 0, VERBOSITY, sc_margin);
+    sc.construct();
+
+    auto sum_of_costs = 0;
+    for (int i = 0; i < ins.N; ++i) {
+      sum_of_costs += sc.paths[i].size() - 1;
+    }
+    assert(sum_of_costs == 12);
+  }
+
   return 0;
 }
