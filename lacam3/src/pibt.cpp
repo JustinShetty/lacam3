@@ -87,12 +87,10 @@ namespace lacam
     Vertex *prioritized_vertex = nullptr;
     if (scatter != nullptr) {
       const auto& goal_index = Q_from.goal_indices[i];
-            std::cout << "agent " << i << " goal_index: " << Q_from.goal_indices[i] << " checking for " << Q_from[i]->id << std::endl;
       const auto& data_for_this_goal = scatter->scatter_data_labeled[i][goal_index];
       auto itr_s = data_for_this_goal.find(Q_from[i]->id);
       if (itr_s != data_for_this_goal.end()) {
         prioritized_vertex = itr_s->second;
-        std::cout << "\tfound, prioritized_vertex: " << prioritized_vertex->id << std::endl;
       }
     }
 
@@ -125,7 +123,6 @@ namespace lacam
       // avoid vertex conflicts
       if (occupied_next[u->id] != NO_AGENT) continue;
 
-      // avoid following conflicts
       const auto j = occupied_now[u->id];
       if (allow_following) {
         // avoid swap conflicts with constraints
@@ -143,6 +140,7 @@ namespace lacam
         // success to plan next one step
         return true;
       } else {
+        // avoid following conflicts
         if (j != NO_AGENT && j != i) {
           if (Q_to[j] == nullptr) {
             // preemptively reserve current location

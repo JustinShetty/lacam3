@@ -188,22 +188,55 @@ namespace lacam
     for (auto i = 0; i < N; ++i) {
       if (paths[i].empty()) continue;
       const auto& path = paths[i];
+      std::cout << "agent " << i << ", current: " << ins->starts[i]->to_str() <<std::endl;
+      auto mh = manhattanDist(ins->starts[i], ins->goal_sequences[i][0]);
+      auto mh_sum = mh;
+      std::cout << "\t" << ins->goal_sequences[i][0]->to_str() << " (" << mh <<" mhd from prev)" << std::endl;
+      for (size_t x = 1; x < ins->goal_sequences[i].size(); ++x) {
+        mh = manhattanDist(ins->goal_sequences[i][x-1], ins->goal_sequences[i][x]);
+        std::cout << "\t" << ins->goal_sequences[i][x]->to_str() << " (" << mh <<" mhd from prev)" << std::endl;
+        mh_sum += mh;
+      }
+      std::cout << "\tpath.size(): " << path.size() << std::endl;
       const auto& goal_sequence = ins->goal_sequences[i];
             scatter_data_labeled[i].resize(goal_sequence.size() + 1);
       int goal_index = 0;
       for (size_t t = 0; t < path.size() - 1; ++t) {
         if (path[t] == goal_sequence[goal_index]) {
-          goal_index = std::min(goal_index, (int)goal_sequence.size());
+          goal_index = std::min(goal_index + 1, (int)goal_sequence.size());
         }
-        // std::cout << "agent " << i << " goal_index " << goal_index << " path[" << t << "]->id " << path[t]->id << " path[" << t+1 << "]->id " << path[t+1]->id << std::endl;
-        // std::cout << "\t" << scatter_data_labeled[i][goal_index].size() << std::endl;
+        std::cout << "agent " << i << " (goal_index " << goal_index << ") " << path[t]->to_str() << " -> " << path[t+1]->to_str() << std::endl;
         scatter_data_labeled[i][goal_index][path[t]->id] = path[t + 1];
       }
     }
 
-    std::cout << "paths: " << paths << std::endl;
-
     info(0, verbose, deadline, "scatter", "\tcompleted");
+  }
+
+  void Scatter::write_solution(const std::string &fileName) const
+  {
+    std::ofstream ofs(fileName);
+    if (!ofs) {
+      std::cerr << "failed to open " << fileName << std::endl;
+      return;
+    }
+
+    int longest_path = 0;
+    for (int i = 0; i < N; ++i) {
+      longest_path = std::max(longest_path, (int)paths[i].size());
+    }
+
+    for (int t = 0; t < longest_path; t++) {
+      ofs << t << ":";
+      for (int j = 0; j < N; ++j) {
+        if (t < paths[j].size()) {
+          ofs << paths[j][t]->to_str() << ",";
+        } else {
+          ofs << paths[j][paths[j].size() - 1]->to_str() << ",";
+        }
+      }
+      ofs << std::endl;
+    }
   }
 
 }  // namespace lacam

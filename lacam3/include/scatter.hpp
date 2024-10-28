@@ -42,6 +42,8 @@ namespace lacam
     Scatter(const Instance *_ins, DistTableMultiGoal *_D,
             const Deadline *_deadline, const int seed = 0, int _verbose = 0,
             int _cost_margin = 2);
+
+    void write_solution(const std::string &fileName) const;
   };
 
 }  // namespace lacam
