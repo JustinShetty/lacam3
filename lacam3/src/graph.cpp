@@ -8,6 +8,11 @@ namespace lacam
   {
   }
 
+  std::string Vertex::to_str() const
+  {
+      return "(" + std::to_string(x) + "," + std::to_string(y) + ")";
+  }
+
   Graph::Graph() : V(Vertices()), width(0), height(0) {}
 
   Graph::~Graph()

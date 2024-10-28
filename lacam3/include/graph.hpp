@@ -17,6 +17,8 @@ namespace lacam
     std::vector<Vertex *> neighbor;
 
     Vertex(int _id, int _index, int _x, int _y);
+
+    std::string to_str() const;
   };
   using Vertices = std::vector<Vertex *>;
   class Config : public std::vector<Vertex *>
