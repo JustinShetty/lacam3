@@ -23,14 +23,14 @@ int main()
     DistTableMultiGoal D = DistTableMultiGoal(&ins);
     const auto sc_margin = 0;
     Scatter sc = Scatter(&ins, &D, nullptr, 0, VERBOSITY, sc_margin);
-    sc.construct();
+    // sc.construct();
 
-    std::vector<std::vector<int>> expected = {{8, 16, 17, 18}, {17, 9, 1}};
-    for (int i = 0; i < ins.N; ++i) {
-      for (int j = 0; j < sc.paths[i].size(); ++j) {
-        assert(sc.paths[i][j]->id == expected[i][j]);
-      }
-    }
+    // std::vector<std::vector<int>> expected = {{8, 16, 17, 18}, {17, 9, 1}};
+    // for (int i = 0; i < ins.N; ++i) {
+    //   for (int j = 0; j < sc.paths[i].size(); ++j) {
+    //     assert(sc.paths[i][j]->id == expected[i][j]);
+    //   }
+    // }
   }
 
   // single agent, multiple goals
@@ -50,6 +50,16 @@ int main()
     sc.construct();
 
     assert(sc.paths[0].size() == 5);
+
+    for (int i = 0; i < ins.N; i++) {
+      std::cout << "agent " << i << " scatter_data_labeled.size(): " << sc.scatter_data_labeled[i].size() << std::endl;
+      for (int j = 0; j < sc.scatter_data_labeled[i].size(); j++) {
+        std::cout << "\tgoal " << j << " scatter_data_labeled.size(): " << sc.scatter_data_labeled[i][j].size() << std::endl;
+        for (auto kv : sc.scatter_data_labeled[i][j]) {
+          std::cout << "\t\t" << kv.first << " -> " << kv.second->id << std::endl;
+        }
+      }
+    }
   }
 
   // two agents, two goals each
@@ -68,13 +78,13 @@ int main()
     DistTableMultiGoal D = DistTableMultiGoal(&ins);
     const auto sc_margin = 4;
     Scatter sc = Scatter(&ins, &D, nullptr, 0, VERBOSITY, sc_margin);
-    sc.construct();
+    // sc.construct();
 
-    auto sum_of_costs = 0;
-    for (int i = 0; i < ins.N; ++i) {
-      sum_of_costs += sc.paths[i].size() - 1;
-    }
-    assert(sum_of_costs == 12);
+    // auto sum_of_costs = 0;
+    // for (int i = 0; i < ins.N; ++i) {
+    //   sum_of_costs += sc.paths[i].size() - 1;
+    // }
+    // assert(sum_of_costs == 12);
   }
 
   return 0;

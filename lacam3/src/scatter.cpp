@@ -19,7 +19,7 @@ namespace lacam
         cost_margin(_cost_margin),
         sum_of_path_length(0),
         paths(N),
-        scatter_data(N),
+        scatter_data_labeled(N),
         CT(ins)
   {
   }
@@ -187,10 +187,21 @@ namespace lacam
     // set scatter data
     for (auto i = 0; i < N; ++i) {
       if (paths[i].empty()) continue;
-      for (size_t t = 0; t < paths[i].size() - 1; ++t) {
-        scatter_data[i][paths[i][t]->id] = paths[i][t + 1];
+      const auto& path = paths[i];
+      const auto& goal_sequence = ins->goal_sequences[i];
+            scatter_data_labeled[i].resize(goal_sequence.size() + 1);
+      int goal_index = 0;
+      for (size_t t = 0; t < path.size() - 1; ++t) {
+        if (path[t] == goal_sequence[goal_index]) {
+          goal_index = std::min(goal_index, (int)goal_sequence.size());
+        }
+        // std::cout << "agent " << i << " goal_index " << goal_index << " path[" << t << "]->id " << path[t]->id << " path[" << t+1 << "]->id " << path[t+1]->id << std::endl;
+        // std::cout << "\t" << scatter_data_labeled[i][goal_index].size() << std::endl;
+        scatter_data_labeled[i][goal_index][path[t]->id] = path[t + 1];
       }
     }
+
+    std::cout << "paths: " << paths << std::endl;
 
     info(0, verbose, deadline, "scatter", "\tcompleted");
   }

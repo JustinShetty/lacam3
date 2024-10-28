@@ -31,8 +31,8 @@ namespace lacam
 
     // outcome
     std::vector<Path> paths;
-    // agent, vertex-id, next vertex
-    std::vector<std::unordered_map<int, Vertex *>> scatter_data;
+    // agent, label, vertex-id, next vertex
+    std::vector<std::vector<std::unordered_map<int, Vertex *>>> scatter_data_labeled;
 
     // collision data
     CollisionTable CT;

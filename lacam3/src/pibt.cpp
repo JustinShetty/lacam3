@@ -86,9 +86,13 @@ namespace lacam
     // exploit scatter data
     Vertex *prioritized_vertex = nullptr;
     if (scatter != nullptr) {
-      auto itr_s = scatter->scatter_data[i].find(Q_from[i]->id);
-      if (itr_s != scatter->scatter_data[i].end()) {
+      const auto& goal_index = Q_from.goal_indices[i];
+            std::cout << "agent " << i << " goal_index: " << Q_from.goal_indices[i] << " checking for " << Q_from[i]->id << std::endl;
+      const auto& data_for_this_goal = scatter->scatter_data_labeled[i][goal_index];
+      auto itr_s = data_for_this_goal.find(Q_from[i]->id);
+      if (itr_s != data_for_this_goal.end()) {
         prioritized_vertex = itr_s->second;
+        std::cout << "\tfound, prioritized_vertex: " << prioritized_vertex->id << std::endl;
       }
     }
 
