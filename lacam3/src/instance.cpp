@@ -8,12 +8,11 @@ namespace lacam
     if (delete_graph_after_used) delete G;
   }
 
-  Instance::Instance(Graph *_G, const Config &_starts, const Config &_goals,
+  Instance::Instance(Graph *_G, const Config &_starts,
                      const std::vector<std::vector<Vertex *>> &_goal_sequences,
                      uint _N)
       : G(_G),
         starts(_starts),
-        goals(_goals),
         goal_sequences(_goal_sequences),
         N(_N)
   {
@@ -24,14 +23,12 @@ namespace lacam
                      const std::vector<int> &goal_indexes)
       : G(new Graph(map_filename)),
         starts(Config()),
-        goals(Config()),
         N(start_indexes.size()),
         delete_graph_after_used(true)
   {
     for (auto k : start_indexes) starts.push_back(G->U[k], 0);
     for (auto k : goal_indexes) {
       const auto vp = G->U[k];
-      goals.push_back(vp, 0);
       goal_sequences.push_back(std::vector<Vertex *>{vp});
     }
   }
@@ -41,7 +38,6 @@ namespace lacam
                      const std::vector<std::vector<int>> &goal_index_sequences)
       : G(new Graph(map_filename)),
         starts(Config()),
-        goals(Config()),
         N(start_indexes.size())
   {
     if (start_indexes.size() != N) {
@@ -58,7 +54,6 @@ namespace lacam
       std::vector<Vertex *> as_vertices;
       for (auto k : goal_sequence) as_vertices.push_back(G->U[k]);
       goal_sequences.push_back(as_vertices);
-      goals.push_back(as_vertices.back(), as_vertices.size() - 1);
     }
   }
 
@@ -70,7 +65,6 @@ namespace lacam
                      const std::string &map_filename, const int _N)
       : G(new Graph(map_filename)),
         starts(Config()),
-        goals(Config()),
         N(_N),
         delete_graph_after_used(true)
   {
@@ -99,7 +93,6 @@ namespace lacam
         auto g = G->U[G->width * y_g + x_g];
         if (s == nullptr || g == nullptr) continue;
         starts.push_back(s, 0);
-        goals.push_back(g, 0);
         goal_sequences.push_back(std::vector<Vertex *>{g});
       }
 
@@ -111,7 +104,6 @@ namespace lacam
                      const int seed)
       : G(new Graph(map_filename)),
         starts(Config()),
-        goals(Config()),
         N(_N),
         delete_graph_after_used(true)
   {
@@ -139,16 +131,15 @@ namespace lacam
     while (true) {
       if (j >= K) return;
       const auto vp = G->V[g_indexes[j]];
-      goals.push_back(vp, 0);
       goal_sequences.push_back(std::vector<Vertex *>{vp});
-      if (goals.size() == N) break;
+      if (goal_sequences.size() == N) break;
       ++j;
     }
   }
 
   bool Instance::is_valid(const int verbose) const
   {
-    if (N != starts.size() || N != goals.size()) {
+    if (N != starts.size() || N != goal_sequences.size()) {
       info(1, verbose, "invalid N, check instance");
       return false;
     }

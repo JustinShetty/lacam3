@@ -11,7 +11,7 @@ int main()
     const auto ins = Instance(scen_filename, map_filename, 3);
     auto dist_table = DistTableMultiGoal(ins);
 
-    assert(dist_table.get(0, 0, ins.goals[0]) == 0);
+    assert(dist_table.get(0, 0, ins.goal_sequences[0].back()) == 0);
     assert(dist_table.get(0, 0, ins.starts[0]) == 16);
   }
 

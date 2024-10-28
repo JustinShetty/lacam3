@@ -308,7 +308,8 @@ namespace lacam
   {
     auto cost = 0;
     for (auto i = 0; i < N; ++i) {
-      if (C1[i] != ins->goals[i] || C2[i] != ins->goals[i]) {
+      if (C1[i] != ins->goal_sequences[i][C1.goal_indices[i]] ||
+          C2[i] != ins->goal_sequences[i][C2.goal_indices[i]]) {
         cost += 1;
       }
     }
@@ -356,14 +357,13 @@ namespace lacam
 
   Solution Planner::get_refined_plan(const Solution &plan)
   {
-    // throw std::runtime_error("get_refined_plan not implemented");
     auto MT_internal = std::mt19937(seed_refiner);
     if (depth < 1 && plan.size() > 3 &&
         get_random_float(MT_internal) < RECURSIVE_RATE) {
       // recursive LaCAM
       auto ins_tmp = Instance(
-          ins->G, plan[get_random_int(MT_internal, 1, plan.size() - 2)],
-          ins->goals, ins->goal_sequences, N);
+          ins->G, plan[get_random_int(MT_internal, 1, plan.size() - 2)], 
+          ins->goal_sequences, N);
       auto deadline_tmp =
           Deadline(std::min(RECURSIVE_TIME_LIMIT,
                             deadline == nullptr ? INT_MAX

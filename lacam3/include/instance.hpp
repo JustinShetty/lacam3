@@ -13,13 +13,12 @@ namespace lacam
   struct Instance {
     Graph *G;       // graph
     Config starts;  // initial configuration
-    Config goals;   // goal configuration
     std::vector<std::vector<Vertex *>>
         goal_sequences;  // agent-id -> goal sequence
     const uint N;        // number of agents
     bool delete_graph_after_used;
 
-    Instance(Graph *_G, const Config &_starts, const Config &_goals,
+    Instance(Graph *_G, const Config &_starts,
              const std::vector<std::vector<Vertex *>> &_goal_sequences,
              uint _N);
     Instance(const std::string &map_filename,

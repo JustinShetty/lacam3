@@ -138,11 +138,11 @@ namespace lacam
       auto k = ins.starts[i]->index;
       log << "(" << get_x(k) << "," << get_y(k) << "),";
     }
-    log << "\ngoals=";
-    for (size_t i = 0; i < ins.N; ++i) {
-      auto k = ins.goals[i]->index;
-      log << "(" << get_x(k) << "," << get_y(k) << "),";
-    }
+    // log << "\ngoals=";
+    // for (size_t i = 0; i < ins.N; ++i) {
+    //   auto k = ins.goals[i]->x;
+    //   log << "(" << get_x(k) << "," << get_y(k) << "),";
+    // }
     log << "\nsolution=\n";
     for (size_t t = 0; t < solution.size(); ++t) {
       log << t << ":";

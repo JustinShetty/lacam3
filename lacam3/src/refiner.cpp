@@ -43,8 +43,9 @@ namespace lacam
       for (auto _i = 0; _i < num_refine_agents; ++_i) {
         const auto i = order[k * num_refine_agents + _i];
         // note: I also tested A*, but SIPP was better
-        new_paths[_i] = sipp(i, ins->starts[i], ins->goals[i], D, &CT, deadline,
-                             old_cost - new_cost - 1);
+        // XXX
+        // new_paths[_i] = sipp(i, ins->starts[i], ins->goals[i], D, &CT, deadline,
+        //                      old_cost - new_cost - 1);
         if (new_paths[_i].empty()) break;  // failure
         new_cost += get_path_loss(new_paths[_i]);
         CT.enrollPath(i, new_paths[_i]);
