@@ -1,0 +1,3 @@
+solver_name: "lacam_no_following"
+solver_options:
+  - "--no-all"

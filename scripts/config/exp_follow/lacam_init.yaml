@@ -1,0 +1,4 @@
+solver_name: "lacam_init"
+solver_options:
+  - "--no-all"
+  - "--allow-following"
