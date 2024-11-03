@@ -2,7 +2,7 @@ root: ../data/exp/womapf/follow
 num_min_agents: 1000
 num_max_agents: 1000
 num_interval_agents: 50
-time_limit_sec: 30
+time_limit_sec: 60
 time_limit_sec_force: 300
 seed_start: 1
 seed_end: 1
