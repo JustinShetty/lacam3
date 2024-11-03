@@ -136,7 +136,7 @@ int main(int argc, char *argv[])
           : std::stof(program.get<std::string>("recursive-time-limit")) * 1000;
   Planner::CHECKPOINTS_DURATION =
       std::stof(program.get<std::string>("checkpoints-duration")) * 1000;
-  Planner::FLG_ALLOW_FOLLOWING = program.get<bool>("allow_following");
+  Planner::FLG_ALLOW_FOLLOWING = program.get<bool>("allow-following");
 
   // solve
   const auto deadline = Deadline(time_limit_sec * 1000);
