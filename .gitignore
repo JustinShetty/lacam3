@@ -47,3 +47,5 @@ scen
 lacam3/CMakeFiles/
 lacam3/Makefile
 lacam3/cmake_install.cmake
+
+venv/
