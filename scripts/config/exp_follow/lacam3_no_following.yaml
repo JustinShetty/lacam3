@@ -1,4 +1,4 @@
-solver_name: "lacam3_init"
+solver_name: "lacam3_no_following"
 solver_options:
   - "--no-scatter"
   - "--no-star"
