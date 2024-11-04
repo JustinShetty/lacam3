@@ -1,7 +1,7 @@
 root: ../data/exp/womapf/follow
-num_min_agents: 1000
+num_min_agents: 100
 num_max_agents: 1000
-num_interval_agents: 50
+num_interval_agents: 100
 time_limit_sec: 60
 time_limit_sec_force: 300
 seed_start: 1
@@ -27,9 +27,9 @@ maps:
   - ht_mansion_n
   - lak303d
   - lt_gallowstemplar_n
-  # - maze-128-128-1
-  - maze-128-128-10
+  - maze-128-128-1
   - maze-128-128-2
+  - maze-128-128-10
   - maze-32-32-2
   - maze-32-32-4
   - orz900d
