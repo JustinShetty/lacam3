@@ -1,0 +1,11 @@
+solver_name: "lacam_mccg"
+solver_options:
+  - "--no-star"
+  # - "--no-multi-thread"
+  # - "--pibt-num 1"
+  - "--no-refiner"
+  - "--no-scatter"
+  - "--random-insert-prob1 0"
+  - "--random-insert-prob2 0"
+  - "--recursive-rate 0"
+  - "--allow-following"
