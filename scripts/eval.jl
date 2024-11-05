@@ -12,6 +12,11 @@ import Statistics: mean, median
 # round
 r = (x) -> round(x, digits = 3)
 
+function count_vertices(filename::String)
+    file_content = read(filename, String)
+    dot_count = count(c -> c == ".", file_content)
+    return dot_count
+
 function main(config_files...)
     # load experimental setting
     config = merge(map(YAML.load_file, config_files)...)
@@ -135,6 +140,7 @@ function main(config_files...)
             :search_iteration => 0,
             :num_high_level_node => 0,
             :num_low_level_node => 0,
+            :num_open_vertices => count_vertices(map_file),
         )
         if isfile(output_file)
             for line in readlines(output_file)
