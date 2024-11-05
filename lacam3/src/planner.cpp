@@ -28,6 +28,14 @@ namespace lacam
 
   constexpr auto TIME_ZERO = std::chrono::seconds(0);
 
+  bool is_goal_config(const Instance* ins, const Config& C) {
+    if (!enough_goals_reached(C, ins->get_total_goals())) return false;
+    for (int i = 0; i < ins->N; i++) {
+      if (C[i] != ins->goal_sequences[i].back()) return false;
+    }
+    return true;
+  }
+
   Planner::Planner(const Instance *_ins, int _threshold, int _verbose,
                    const Deadline *_deadline, int _seed, int _depth,
                    DistTableMultiGoal *_D)
@@ -129,7 +137,8 @@ namespace lacam
       }
 
       // check goal condition
-      if (H_goal == nullptr && enough_goals_reached(H->C, threshold)) {
+      if (H_goal == nullptr && is_goal_config(ins, H->C)) {
+      // if (H_goal == nullptr && enough_goals_reached(H->C, threshold)) {
         time_initial_solution = elapsed_ms(deadline);
         cost_initial_solution = H->g;
         H_goal = H;

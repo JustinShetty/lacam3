@@ -14,8 +14,9 @@ r = (x) -> round(x, digits = 3)
 
 function count_vertices(filename::String)
     file_content = read(filename, String)
-    dot_count = count(c -> c == ".", file_content)
+    dot_count = count(c -> c == '.', file_content)
     return dot_count
+end
 
 function main(config_files...)
     # load experimental setting

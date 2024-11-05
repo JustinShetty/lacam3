@@ -82,9 +82,14 @@ for map_name in maps:
             key = (result["scen"], result["num_agents"])
             organized_data_no_following[map_name][key] = result
 
-# for field in ["makespan"]:
-for field in ["soc", "sum_of_loss", "makespan", "comp_time", "search_iteration"]:
-    # print(f"Generating plots for {field}")
+fields = {
+    "soc": "Sum of Costs",
+    "sum_of_loss": "Sum of Loss",
+    "Makespan": "Makespan",
+    "comp_time": "Computation Time (ms)",
+    "search_iteration": "Search Iterations",
+}
+for field, label in fields.items():
     (fig_dir / field).mkdir(parents=False, exist_ok=True)
     for map_name, data in organized_data_init.items():
         fig = plt.figure()
@@ -152,10 +157,9 @@ for field in ["soc", "sum_of_loss", "makespan", "comp_time", "search_iteration"]
 
         plt.title(f"Map: {map_name}")
         plt.xlabel(f"{len(bar_x)//len(unique_n)} instances per n")
-        plt.ylabel(field)
+        plt.ylabel(label)
 
         plt.gcf().set_size_inches(10, 5)
-
         fname = fig_dir / field / f"{map_name}.png"
         print(f"Saving {fname}")
         plt.savefig(fname, dpi=300)
