@@ -84,8 +84,10 @@ for map_name in maps:
 
 # for field in ["makespan"]:
 for field in ["soc", "sum_of_loss", "makespan", "comp_time", "search_iteration"]:
+    # print(f"Generating plots for {field}")
+    (fig_dir / field).mkdir(parents=False, exist_ok=True)
     for map_name, data in organized_data_init.items():
-        plt.figure()
+        fig = plt.figure()
         init = {k: v for k, v in sorted(data.items(), key=lambda item: item[0][1])}
         bar_x = np.arange(len(init))
         vals_init = [v[field] for v in init.values()]
@@ -119,7 +121,7 @@ for field in ["soc", "sum_of_loss", "makespan", "comp_time", "search_iteration"]
             alpha=0.7,
             edgecolor="none",
         )
-        plt.legend(["No following (pLaCAM)", "Baseline (LaCAM)"])
+        plt.legend(["No following (pLaCAM)", "Baseline (LaCAM)"], loc="center left")
 
         # Add background rectangles for each label range
         plt.xticks([])
@@ -154,6 +156,8 @@ for field in ["soc", "sum_of_loss", "makespan", "comp_time", "search_iteration"]
 
         plt.gcf().set_size_inches(10, 5)
 
-        fname = fig_dir / f"{field}_{map_name}.png"
+        fname = fig_dir / field / f"{map_name}.png"
+        print(f"Saving {fname}")
         plt.savefig(fname, dpi=300)
+        plt.close(fig)
 # plt.show()
