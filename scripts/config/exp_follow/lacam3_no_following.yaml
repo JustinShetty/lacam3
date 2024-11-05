@@ -1,4 +1,0 @@
-solver_name: "lacam3_init"
-solver_options:
-  - "--no-scatter"
-  - "--no-star"
