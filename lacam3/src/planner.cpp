@@ -137,6 +137,7 @@ namespace lacam
       }
 
       // check goal condition
+      // XXX use is_goal_config by default, enough_goals_reached if threshold specified
       if (H_goal == nullptr && is_goal_config(ins, H->C)) {
       // if (H_goal == nullptr && enough_goals_reached(H->C, threshold)) {
         time_initial_solution = elapsed_ms(deadline);
@@ -317,8 +318,10 @@ namespace lacam
   {
     auto cost = 0;
     for (auto i = 0; i < N; ++i) {
-      if (C1[i] != ins->goal_sequences[i][C1.goal_indices[i]] ||
-          C2[i] != ins->goal_sequences[i][C2.goal_indices[i]]) {
+      auto c1_idx = std::min(C1.goal_indices[i], (int)ins->goal_sequences[i].size() - 1);
+      auto c2_idx = std::min(C2.goal_indices[i], (int)ins->goal_sequences[i].size() - 1);
+      if (C1[i] != ins->goal_sequences[i][c1_idx] ||
+          C2[i] != ins->goal_sequences[i][c2_idx]) {
         cost += 1;
       }
     }
