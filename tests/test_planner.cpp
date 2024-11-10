@@ -15,7 +15,7 @@ int main()
     const auto map_filename = "../assets/random-32-32-10.map";
     const auto ins = Instance(scen_filename, map_filename, 3);
     assert(ins.is_valid(VERBOSITY));
-    const auto threshold = ins.get_total_goals();
+    const auto threshold = std::nullopt;
 
     auto solution = solve(ins, threshold, VERBOSITY, nullptr, 0);
     assert(solution.size() > 0);
@@ -28,7 +28,7 @@ int main()
     const auto map_filename = "../tests/assets/2x1.map";
     const auto ins = Instance(scen_filename, map_filename, 2);
     assert(ins.is_valid(VERBOSITY));
-    const auto threshold = ins.get_total_goals();
+    const auto threshold = std::nullopt;
 
     auto solution = solve(ins, threshold, VERBOSITY, nullptr, 0);
     assert(solution.empty());
@@ -42,7 +42,7 @@ int main()
     std::vector<std::vector<int>> goal_sequences = {{3, 0}};
     const auto ins = Instance(map_filename, starts, goal_sequences);
     assert(ins.is_valid(VERBOSITY));
-    const auto threshold = ins.get_total_goals();
+    const auto threshold = std::nullopt;
 
     auto solution = solve(ins, threshold, VERBOSITY, nullptr, 0);
     assert(solution.size() > 0);
@@ -57,7 +57,7 @@ int main()
     std::vector<std::vector<int>> goal_sequences = {{3, 0}, {0, 3}};
     const auto ins = Instance(map_filename, starts, goal_sequences);
     assert(ins.is_valid(VERBOSITY));
-    const auto threshold = ins.get_total_goals();
+    const auto threshold = std::nullopt;
 
     auto solution = solve(ins, threshold, VERBOSITY, nullptr, 0);
     assert(solution.size() > 0);
@@ -73,7 +73,7 @@ int main()
     const auto ins = Instance(map_filename, starts, goal_sequences);
     assert(ins.is_valid(VERBOSITY));
 
-    const auto threshold = ins.get_total_goals();
+    const auto threshold = std::nullopt;
     auto solution = solve(ins, threshold, VERBOSITY, nullptr, 0);
     assert(solution.size() > 0);
     assert(is_feasible_solution(ins, solution, threshold, VERBOSITY));

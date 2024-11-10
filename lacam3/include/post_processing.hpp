@@ -2,6 +2,8 @@
  * post processing, e.g., calculating solution quality
  */
 #pragma once
+#include <optional>
+
 #include "dist_table.hpp"
 #include "instance.hpp"
 #include "metrics.hpp"
@@ -11,8 +13,8 @@ namespace lacam
 {
 
   bool is_feasible_solution(const Instance &ins, const Solution &solution,
-                            const int threshold, const bool allow_following,
-                            const int verbose = 0);
+                            const std::optional<int> threshold,
+                            const bool allow_following, const int verbose = 0);
   void print_stats(const int verbose, const Deadline *deadline,
                    const Instance &ins, const Solution &solution,
                    const double comp_time_ms);

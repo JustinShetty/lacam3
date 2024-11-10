@@ -16,6 +16,8 @@
  */
 #pragma once
 
+#include <optional>
+
 #include "dist_table.hpp"
 #include "graph.hpp"
 #include "heuristic.hpp"
@@ -32,7 +34,7 @@ namespace lacam
 
   struct Planner {
     const Instance *ins;
-    const int threshold;
+    const std::optional<int> threshold;
     const Deadline *deadline;
     const int seed;
     std::mt19937 MT;
@@ -92,8 +94,9 @@ namespace lacam
     int cost_initial_solution;
     std::vector<int> checkpoints;
 
-    Planner(const Instance *_ins, int _threshold, int _verbose = 0,
-            const Deadline *_deadline = nullptr, int _seed = 0,
+    Planner(const Instance *_ins, std::optional<int> _threshold = std::nullopt,
+            int _verbose = 0, const Deadline *_deadline = nullptr,
+            int _seed = 0,
             int _depth = 0,                   // used in recursive LaCAM
             DistTableMultiGoal *_D = nullptr  // used in recursive LaCAM
     );

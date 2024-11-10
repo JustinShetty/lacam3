@@ -18,48 +18,42 @@ int main()
     sol[1] = Config({ins.G->U[1], ins.G->U[8]});
     sol[2] = Config({ins.G->U[9], ins.G->U[0]}, {1, 0});
     sol[3] = Config({ins.G->U[9], ins.G->U[1]}, {1, 1});
-    assert(
-        is_feasible_solution(ins, sol, ins.get_total_goals(), allow_following));
+    assert(is_feasible_solution(ins, sol, std::nullopt, allow_following));
 
     // invalid start
     sol[0] = Config({ins.G->U[0], ins.G->U[4]});
     sol[1] = Config({ins.G->U[1], ins.G->U[8]});
     sol[2] = Config({ins.G->U[9], ins.G->U[0]}, {1, 0});
     sol[3] = Config({ins.G->U[9], ins.G->U[1]}, {1, 1});
-    assert(!is_feasible_solution(ins, sol, ins.get_total_goals(),
-                                 allow_following));
+    assert(!is_feasible_solution(ins, sol, std::nullopt, allow_following));
 
     // invalid goal
     sol[0] = Config({ins.G->U[0], ins.G->U[8]});
     sol[1] = Config({ins.G->U[1], ins.G->U[8]});
     sol[2] = Config({ins.G->U[5], ins.G->U[0]}, {0, 0});
     sol[3] = Config({ins.G->U[10], ins.G->U[1]}, {0, 1});
-    assert(!is_feasible_solution(ins, sol, ins.get_total_goals(),
-                                 allow_following));
+    assert(!is_feasible_solution(ins, sol, std::nullopt, allow_following));
 
     // invalid transition
     sol[0] = Config({ins.G->U[0], ins.G->U[8]});
     sol[1] = Config({ins.G->U[10], ins.G->U[8]});
     sol[2] = Config({ins.G->U[9], ins.G->U[0]}, {1, 0});
     sol[3] = Config({ins.G->U[9], ins.G->U[1]}, {0, 1});
-    assert(!is_feasible_solution(ins, sol, ins.get_total_goals(),
-                                 allow_following));
+    assert(!is_feasible_solution(ins, sol, std::nullopt, allow_following));
 
     // following conflict
     sol[0] = Config({ins.G->U[0], ins.G->U[8]});
     sol[1] = Config({ins.G->U[1], ins.G->U[0]});
     sol[2] = Config({ins.G->U[9], ins.G->U[1]}, {1, 1});
     sol[3] = Config({ins.G->U[9], ins.G->U[1]}, {1, 1});
-    assert(!is_feasible_solution(ins, sol, ins.get_total_goals(),
-                                 allow_following));
+    assert(!is_feasible_solution(ins, sol, std::nullopt, allow_following));
 
     // vertex conflict
     sol[0] = Config({ins.G->U[0], ins.G->U[8]});
     sol[1] = Config({ins.G->U[1], ins.G->U[8]});
     sol[2] = Config({ins.G->U[9], ins.G->U[0]}, {1, 0});
     sol[3] = Config({ins.G->U[1], ins.G->U[1]}, {1, 1});
-    assert(!is_feasible_solution(ins, sol, ins.get_total_goals(),
-                                 allow_following));
+    assert(!is_feasible_solution(ins, sol, std::nullopt, allow_following));
   }
 
   {

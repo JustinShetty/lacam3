@@ -28,17 +28,9 @@ namespace lacam
 
   constexpr auto TIME_ZERO = std::chrono::seconds(0);
 
-  bool is_goal_config(const Instance* ins, const Config& C) {
-    if (!enough_goals_reached(C, ins->get_total_goals())) return false;
-    for (int i = 0; i < ins->N; i++) {
-      if (C[i] != ins->goal_sequences[i].back()) return false;
-    }
-    return true;
-  }
-
-  Planner::Planner(const Instance *_ins, int _threshold, int _verbose,
-                   const Deadline *_deadline, int _seed, int _depth,
-                   DistTableMultiGoal *_D)
+  Planner::Planner(const Instance *_ins, std::optional<int> _threshold,
+                   int _verbose, const Deadline *_deadline, int _seed,
+                   int _depth, DistTableMultiGoal *_D)
       : ins(_ins),
         threshold(_threshold),
         deadline(_deadline),
@@ -137,9 +129,10 @@ namespace lacam
       }
 
       // check goal condition
-      // XXX use is_goal_config by default, enough_goals_reached if threshold specified
-      if (H_goal == nullptr && is_goal_config(ins, H->C)) {
-      // if (H_goal == nullptr && enough_goals_reached(H->C, threshold)) {
+      auto goal_reached = threshold.has_value()
+                              ? enough_goals_reached(H->C, threshold.value())
+                              : ins->is_goal_config(H->C);
+      if (H_goal == nullptr && goal_reached) {
         time_initial_solution = elapsed_ms(deadline);
         cost_initial_solution = H->g;
         H_goal = H;
@@ -318,8 +311,10 @@ namespace lacam
   {
     auto cost = 0;
     for (auto i = 0; i < N; ++i) {
-      auto c1_idx = std::min(C1.goal_indices[i], (int)ins->goal_sequences[i].size() - 1);
-      auto c2_idx = std::min(C2.goal_indices[i], (int)ins->goal_sequences[i].size() - 1);
+      auto c1_idx =
+          std::min(C1.goal_indices[i], (int)ins->goal_sequences[i].size() - 1);
+      auto c2_idx =
+          std::min(C2.goal_indices[i], (int)ins->goal_sequences[i].size() - 1);
       if (C1[i] != ins->goal_sequences[i][c1_idx] ||
           C2[i] != ins->goal_sequences[i][c2_idx]) {
         cost += 1;
@@ -374,7 +369,7 @@ namespace lacam
         get_random_float(MT_internal) < RECURSIVE_RATE) {
       // recursive LaCAM
       auto ins_tmp = Instance(
-          ins->G, plan[get_random_int(MT_internal, 1, plan.size() - 2)], 
+          ins->G, plan[get_random_int(MT_internal, 1, plan.size() - 2)],
           ins->goal_sequences, N);
       auto deadline_tmp =
           Deadline(std::min(RECURSIVE_TIME_LIMIT,

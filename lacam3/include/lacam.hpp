@@ -11,7 +11,8 @@
 namespace lacam
 {
 
-  Solution solve(const Instance &ins, const int threshold,
+  Solution solve(const Instance &ins,
+                 const std::optional<int> threshold = std::nullopt,
                  const int verbose = 0, const Deadline *deadline = nullptr,
                  const int seed = 0);
 

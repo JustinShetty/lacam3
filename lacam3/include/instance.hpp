@@ -39,6 +39,8 @@ namespace lacam
     bool is_valid(const int verbose = 0) const;
 
     int get_total_goals() const;
+
+    bool is_goal_config(const Config &C) const;
   };
 
   // solution: a sequence of configurations
