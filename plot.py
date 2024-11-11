@@ -6,12 +6,17 @@ import numpy as np
 import yaml
 from matplotlib.patches import Rectangle
 
-fig_dir = Path.home() / "dev/data/exp/womapf/follow/figures"
+fig_dir = Path.home() / "dev/data/exp/womapf/follow/figures2"
 fig_dir.mkdir(parents=True, exist_ok=True)
 
-lacam_init_dir = Path.home() / "dev/data/exp/womapf/follow/2024-11-04T20-58-33.820"
+# lacam_init_dir = Path.home() / "dev/data/exp/womapf/follow/2024-11-04T20-58-33.820"
+# lacam_no_following_dir = (
+#     Path.home() / "dev/data/exp/womapf/follow/2024-11-04T21-24-52.874"
+# )
+
+lacam_init_dir = Path.home() / "dev/data/exp/womapf/follow/2024-11-05T11-54-36.984"
 lacam_no_following_dir = (
-    Path.home() / "dev/data/exp/womapf/follow/2024-11-04T21-24-52.874"
+    Path.home() / "dev/data/exp/womapf/follow/2024-11-05T12-52-15.971"
 )
 
 
@@ -85,15 +90,15 @@ for map_name in maps:
 fields = {
     "soc": "Sum of Costs",
     "sum_of_loss": "Sum of Loss",
-    "Makespan": "Makespan",
+    "makespan": "Makespan",
     "comp_time": "Computation Time (ms)",
     "search_iteration": "Search Iterations",
 }
 for field, label in fields.items():
     (fig_dir / field).mkdir(parents=False, exist_ok=True)
     for map_name, data in organized_data_init.items():
-        fig = plt.figure()
         init = {k: v for k, v in sorted(data.items(), key=lambda item: item[0][1])}
+        v = list(init.values())[0]["num_open_vertices"]
         bar_x = np.arange(len(init))
         vals_init = [v[field] for v in init.values()]
         for i in range(len(vals_init)):
@@ -113,6 +118,7 @@ for field, label in fields.items():
             k = list(no_follow.keys())[i]
             if not no_follow[k]["solved"]:
                 vals_no_following[i] = 0
+        fig = plt.figure()
         plt.bar(
             bar_x,
             vals_no_following,
@@ -146,7 +152,7 @@ for field, label in fields.items():
             plt.text(
                 pos,
                 max(vals_init + vals_no_following) + 0.5,
-                f"n={unique_n[i]}",
+                "c={:.1f}%".format(100.0 * unique_n[i] / v),
                 ha="center",
                 va="bottom",
             )
@@ -156,7 +162,7 @@ for field, label in fields.items():
         )
 
         plt.title(f"Map: {map_name}")
-        plt.xlabel(f"{len(bar_x)//len(unique_n)} instances per n")
+        plt.xlabel(f"{len(bar_x)//len(unique_n)} instances per c")
         plt.ylabel(label)
 
         plt.gcf().set_size_inches(10, 5)
