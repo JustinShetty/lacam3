@@ -1,7 +1,6 @@
 solver_name: "lacam_star"
 solver_options:
   - "--pibt-num 1"
-  - "--no-multi-thread"
   - "--no-refiner"
   - "--no-scatter"
   # - "--allow-following"
