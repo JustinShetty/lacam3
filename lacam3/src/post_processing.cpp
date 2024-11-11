@@ -7,8 +7,8 @@ namespace lacam
 {
 
   bool is_feasible_solution(const Instance &ins, const Solution &solution,
-                            const int threshold, const bool allow_following,
-                            const int verbose)
+                            const std::optional<int> threshold,
+                            const bool allow_following, const int verbose)
   {
     if (solution.empty()) return true;
 
@@ -19,7 +19,11 @@ namespace lacam
     }
 
     // check goal locations
-    if (!enough_goals_reached(solution.back(), threshold)) {
+    const auto goal_ok =
+        threshold.has_value()
+            ? enough_goals_reached(solution.back(), threshold.value())
+            : ins.is_goal_config(solution.back());
+    if (!goal_ok) {
       info(1, verbose, "invalid goals");
       return false;
     }

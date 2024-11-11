@@ -11,10 +11,7 @@ namespace lacam
   Instance::Instance(Graph *_G, const Config &_starts,
                      const std::vector<std::vector<Vertex *>> &_goal_sequences,
                      uint _N)
-      : G(_G),
-        starts(_starts),
-        goal_sequences(_goal_sequences),
-        N(_N)
+      : G(_G), starts(_starts), goal_sequences(_goal_sequences), N(_N)
   {
   }
 
@@ -36,9 +33,7 @@ namespace lacam
   Instance::Instance(const std::string &map_filename,
                      const std::vector<int> &start_indexes,
                      const std::vector<std::vector<int>> &goal_index_sequences)
-      : G(new Graph(map_filename)),
-        starts(Config()),
-        N(start_indexes.size())
+      : G(new Graph(map_filename)), starts(Config()), N(start_indexes.size())
   {
     if (start_indexes.size() != N) {
       throw std::invalid_argument("start_indexes and N size mismatch");
@@ -153,6 +148,15 @@ namespace lacam
       total_goals += goals.size();
     }
     return total_goals;
+  }
+
+  bool Instance::is_goal_config(const Config &C) const
+  {
+    if (!enough_goals_reached(C, get_total_goals())) return false;
+    for (int i = 0; i < N; i++) {
+      if (C[i] != goal_sequences[i].back()) return false;
+    }
+    return true;
   }
 
 }  // namespace lacam
