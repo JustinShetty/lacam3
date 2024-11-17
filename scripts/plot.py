@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import csv
 from pathlib import Path
 
@@ -6,18 +7,13 @@ import numpy as np
 import yaml
 from matplotlib.patches import Rectangle
 
-fig_dir = Path.home() / "dev/data/exp/womapf/follow/figures2"
+fig_dir = Path.home() / "dev/data/exp/follow/figures"
 fig_dir.mkdir(parents=True, exist_ok=True)
 
-# lacam_init_dir = Path.home() / "dev/data/exp/womapf/follow/2024-11-04T20-58-33.820"
+lacam_init_dir = Path.home() / "dev/data/exp/follow/2024-11-17T18-32-15.264"
 # lacam_no_following_dir = (
-#     Path.home() / "dev/data/exp/womapf/follow/2024-11-04T21-24-52.874"
+#     Path.home() / "dev/data/expfollow/2024-11-05T12-52-15.971"
 # )
-
-lacam_init_dir = Path.home() / "dev/data/exp/womapf/follow/2024-11-05T11-54-36.984"
-lacam_no_following_dir = (
-    Path.home() / "dev/data/exp/womapf/follow/2024-11-05T12-52-15.971"
-)
 
 
 def reformat_result(result):
@@ -54,10 +50,10 @@ def read_csv(file_path):
 # Read and parse result.csv from each directory
 init_config = read_yaml(lacam_init_dir / "config.yaml")
 init_result = read_csv(lacam_init_dir / "result.csv")
-no_follow_config = read_yaml(lacam_no_following_dir / "config.yaml")
-no_following_result = read_csv(lacam_no_following_dir / "result.csv")
+# no_follow_config = read_yaml(lacam_no_following_dir / "config.yaml")
+# no_following_result = read_csv(lacam_no_following_dir / "result.csv")
 
-assert init_config["maps"] == no_follow_config["maps"]
+# assert init_config["maps"] == no_follow_config["maps"]
 maps = init_config["maps"]
 n_agents = list(
     range(
@@ -68,11 +64,11 @@ n_agents = list(
 )
 
 init_result = reformat_result(init_result)
-no_following_result = reformat_result(no_following_result)
+# no_following_result = reformat_result(no_following_result)
 
 # Organize the data by map, then by (scen, num_agents) tuple
 organized_data_init = {}
-organized_data_no_following = {}
+# organized_data_no_following = {}
 
 for map_name in maps:
     organized_data_init[map_name] = {}
@@ -81,11 +77,11 @@ for map_name in maps:
             key = (result["scen"], result["num_agents"])
             organized_data_init[map_name][key] = result
 
-    organized_data_no_following[map_name] = {}
-    for result in no_following_result:
-        if map_name in result["map_name"]:
-            key = (result["scen"], result["num_agents"])
-            organized_data_no_following[map_name][key] = result
+    # organized_data_no_following[map_name] = {}
+    # for result in no_following_result:
+    #     if map_name in result["map_name"]:
+    #         key = (result["scen"], result["num_agents"])
+    #         organized_data_no_following[map_name][key] = result
 
 fields = {
     "soc": "Sum of Costs",
@@ -97,34 +93,39 @@ fields = {
 for field, label in fields.items():
     (fig_dir / field).mkdir(parents=False, exist_ok=True)
     for map_name, data in organized_data_init.items():
+        fig = plt.figure()
+
         init = {k: v for k, v in sorted(data.items(), key=lambda item: item[0][1])}
-        v = list(init.values())[0]["num_open_vertices"]
+        unique_n = sorted(list(set([v["num_agents"] for v in init.values()])))
+        num_vertices = list(init.values())[0]["num_open_vertices"]
+        unique_congestion = [round(100 * x / num_vertices, 2) for x in unique_n]
+        instances_per_c = len(init) // len(unique_n)
+
         bar_x = np.arange(len(init))
         vals_init = [v[field] for v in init.values()]
         for i in range(len(vals_init)):
             k = list(init.keys())[i]
             if not init[k]["solved"]:
                 vals_init[i] = 0
-        no_follow = {
-            k: v
-            for k, v in sorted(
-                organized_data_no_following[map_name].items(),
-                key=lambda item: item[0][1],
-            )
-        }
-        unique_n = sorted(list(set([v["num_agents"] for v in no_follow.values()])))
-        vals_no_following = [v[field] for v in no_follow.values()]
-        for i in range(len(vals_no_following)):
-            k = list(no_follow.keys())[i]
-            if not no_follow[k]["solved"]:
-                vals_no_following[i] = 0
-        fig = plt.figure()
-        plt.bar(
-            bar_x,
-            vals_no_following,
-            width=1.0,
-            edgecolor="none",
-        )
+        # no_follow = {
+        #     k: v
+        #     for k, v in sorted(
+        #         organized_data_no_following[map_name].items(),
+        #         key=lambda item: item[0][1],
+        #     )
+        # }
+
+        # vals_no_following = [v[field] for v in no_follow.values()]
+        # for i in range(len(vals_no_following)):
+        #     k = list(no_follow.keys())[i]
+        #     if not no_follow[k]["solved"]:
+        #         vals_no_following[i] = 0
+        # plt.bar(
+        #     bar_x,
+        #     vals_no_following,
+        #     width=1.0,
+        #     edgecolor="none",
+        # )
         plt.bar(
             bar_x,
             vals_init,
@@ -132,18 +133,20 @@ for field, label in fields.items():
             alpha=0.7,
             edgecolor="none",
         )
-        plt.legend(["No following (pLaCAM)", "Baseline (LaCAM)"], loc="center left")
+        # plt.legend(["No following (pLaCAM)", "Baseline (LaCAM)"], loc="center left")
 
         # Add background rectangles for each label range
         plt.xticks([])
-        spacing = len(bar_x) / len(unique_n)
-        label_positions = [(i * spacing) + (spacing / 2) for i in range(len(unique_n))]
+        spacing = len(bar_x) / len(unique_congestion)
+        label_positions = [
+            (i * spacing) + (spacing / 2) for i in range(len(unique_congestion))
+        ]
         for i, pos in enumerate(label_positions):
             plt.gca().add_patch(
                 Rectangle(
                     (pos - (spacing / 2) - 0.5, 0),
                     spacing,
-                    max(vals_init + vals_no_following) + 1,
+                    max(vals_init) + 10,
                     color="lightgray",
                     alpha=0.3,
                     zorder=0,
@@ -151,8 +154,8 @@ for field, label in fields.items():
             )
             plt.text(
                 pos,
-                max(vals_init + vals_no_following) + 0.5,
-                "c={:.1f}%".format(100.0 * unique_n[i] / v),
+                max(vals_init) + 0.5,
+                "c={:.0f}% ({})".format(unique_congestion[i], unique_n[i]),
                 ha="center",
                 va="bottom",
             )
@@ -162,8 +165,9 @@ for field, label in fields.items():
         )
 
         plt.title(f"Map: {map_name}")
-        plt.xlabel(f"{len(bar_x)//len(unique_n)} instances per c")
+        plt.xlabel(f"{instances_per_c} instances per c")
         plt.ylabel(label)
+        plt.ylim(0, max(vals_init) * 1.05)
 
         plt.gcf().set_size_inches(10, 5)
         fname = fig_dir / field / f"{map_name}.png"
