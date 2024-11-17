@@ -91,7 +91,7 @@ function main(config_files...)
     result = Vector{Any}(undef, num_total_tasks)
     t_start = Base.time_ns()
 
-    println(solver_name)
+    println("Writing $(solver_name) results to $(root_dir)")
 
     Threads.@threads for (k, (scen_file, map_file, N, seed)) in loops
         output_file = joinpath(tmp_dir, "result-$(k).txt")
