@@ -35,6 +35,7 @@ function main(config_files...)
     maps = get(config, "maps", Vector{String}())
     date_str = replace(string(Dates.now()), ":" => "-")
     root_dir = joinpath(get(config, "root", joinpath(pwd(), "..", "data", "exp")), date_str)
+    congestion_levels = get(config, "congestion_levels", Vector{Int}())
     !isdir(root_dir) && mkpath(root_dir)
 
     # save configuration file
@@ -59,14 +60,14 @@ function main(config_files...)
         @map(
             x -> begin
                 lines = readlines(x)
-                N_max = min(length(lines) - 1, num_max_agents)
+                N_max = length(lines) - 1
                 map_name = joinpath(
                     @__DIR__,
                     "map",
                     last(split(match(r"\d+\t(.+).map\t(.+)", lines[2])[1], "/")) * ".map",
                 )
-                agents = collect(num_min_agents:num_interval_agents:N_max)
-                (isempty(agents) || last(agents) != N_max) && push!(agents, N_max)
+                total_vertices = count_vertices(map_name)
+                agents = [round(Int, (level/100) * total_vertices) for level in congestion_levels if round(Int, (level/100) * total_vertices) <= N_max]
                 vcat(
                     Iterators.product(
                         [x],
