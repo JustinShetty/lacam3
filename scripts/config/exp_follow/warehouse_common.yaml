@@ -1,0 +1,26 @@
+root: ../data/exp/follow
+num_min_agents: 100
+num_max_agents: 1000
+num_interval_agents: 100
+congestion_levels:
+  - 1
+  - 5
+  - 10
+  - 15
+  - 20
+  - 25
+time_limit_sec: 30
+time_limit_sec_force: 60
+seed_start: 1
+seed_end: 1
+scen: scen-warehouse
+
+solver_options:
+  - "--checkpoints-duration"
+  - "1"
+
+maps:
+  - warehouse-10-20-10-2-1
+  - warehouse-10-20-10-2-2
+  - warehouse-20-40-10-2-1
+  - warehouse-20-40-10-2-2
