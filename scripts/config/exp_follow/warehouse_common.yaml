@@ -4,6 +4,9 @@ num_max_agents: 1000
 num_interval_agents: 100
 congestion_levels:
   - 1
+  - 2
+  - 3
+  - 4
   - 5
   - 10
   - 15
