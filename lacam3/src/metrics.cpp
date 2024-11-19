@@ -104,6 +104,7 @@ namespace lacam
     int c = 0;
     for (size_t i = 0; i < ins.N; ++i) {
       int c_i = 0;
+      c_i += dist_table.get(i, 0, ins.starts[i]);
       for (size_t j = 1; j < ins.goal_sequences[i].size(); ++j) {
         c_i += dist_table.get(i, j, ins.goal_sequences[i][j - 1]);
       }
@@ -117,6 +118,7 @@ namespace lacam
   {
     int c = 0;
     for (size_t i = 0; i < ins.N; ++i) {
+      c += dist_table.get(i, 0, ins.starts[i]);
       for (size_t j = 1; j < ins.goal_sequences[i].size(); ++j) {
         c += dist_table.get(i, j, ins.goal_sequences[i][j - 1]);
       }
