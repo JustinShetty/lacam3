@@ -12,8 +12,8 @@ congestion_levels:
   - 15
   - 20
   - 25
-time_limit_sec: 30
-time_limit_sec_force: 60
+time_limit_sec: 60
+time_limit_sec_force: 90
 seed_start: 1
 seed_end: 1
 scen: scen-warehouse
@@ -23,7 +23,4 @@ solver_options:
   - "1"
 
 maps:
-  - warehouse-10-20-10-2-1
-  - warehouse-10-20-10-2-2
-  - warehouse-20-40-10-2-1
   - warehouse-20-40-10-2-2
