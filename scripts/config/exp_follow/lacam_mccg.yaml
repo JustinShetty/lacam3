@@ -1,8 +1,0 @@
-solver_name: "lacam_mccg"
-solver_options:
-  - "--no-star"
-  - "--no-multi-thread"
-  # - "--pibt-num 1"
-  - "--no-refiner"
-  - "--no-scatter"
-  - "--allow-following"
